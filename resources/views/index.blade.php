@@ -6,88 +6,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/mainMenu.css') }}">
     <title>Game Room</title>
 </head>
 
 <body>
+    {{-- Error Handling --}}
     @if (session('error'))
     <div class="alert alert-danger">
         {{ session('error') }}
         <button class="close" onclick="this.parentElement.style.display='none'">&times;</button>
     </div>
-@endif
+    @endif
 
-    <div id="scene-container"></div>
-
-    <div class="menu">
-        <nav class="nav-buttons">
-            @if (session()->has('player'))
-            <a href="{{ route('profile.index', ['id' => session('player.id')]) }}" style="text-decoration: none; color: black;"><button>Profil</button></a>
-            <a href="{{ route('galleries.index', ['id' => session('player.id')]) }}" style="text-decoration: none; color: black;"><button>Galeri</button></a>
-            @else
-            <a href="{{ route('profile.index', ['id' => 0]) }}" style="text-decoration: none; color: black;"><button>Profil</button></a>
-            <a href="{{ route('galleries.index', ['id' => 0]) }}" style="text-decoration: none; color: black;"><button>Galeri</button></a>
-            @endif
-            <a href="{{ route('tutorial.index') }}" style="text-decoration: none; color: black;"><button>Tutorial</button></a>
-            <a href="{{ route('about.index') }}" style="text-decoration: none; color: black;"><button>Tentang</button></a>
-        </nav>
-        <h1 class="game-title">DINO PUZZLE</h1>
-
-        @if ($errors->any())
-            <div class="error">
+    {{-- Main Container --}}
+    <div class="container">
+        {{-- Header --}}
+        <header>
+            <div class="logo">
+                <img src="/api/placeholder/70/70" alt="DinoMatch Logo">
+                <h1>DinoMatch</h1>
+            </div>
+            <nav>
                 <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <li><a href="{{ route('profile.index', ['id' => session('player.id') ?? 0]) }}">My Dig Site</a></li>
+                    <li><a href="{{ route('galleries.index', ['id' => session('player.id') ?? 0]) }}">Dinopedia</a></li>
+                    <li><a href="{{ route('tutorial.index') }}">How To Play</a></li>
+                    <li><a href="{{ route('about.index') }}">About</a></li>
                 </ul>
-            </div>
-        @endif
+            </nav>
+        </header>
 
-        <a href="{{ route('gallery.index') }}"><button class="play-button">PLAY</button></a>
-        <p style="color: black">atau</p>
-        <form action="{{ route('room.join') }}" method="POST" id="form-join">
-            @csrf
-            <div class="join">
-                <input type="text" name="code" placeholder="Masukkan passcode" required>
-                @if (Session::has('user'))
-                    <button class="join-button" type="submit" id="submitButton">Gabung dalam permainan</button>
-                @else
-                    <button class="join-button" onclick="openModal()">Gabung dalam permainan</button>
-
-                    <div id="myModal" class="modal">
-                        <div class="modal-content">
-                            <h2>Gabung Room</h2>
-                            <input type="text" name="username" placeholder="Nama Anda" required value="{{ session('player.username') }}">
-                            <button type="submit" id="submitButton">Gabung</button>
-                            <button class="btn-close" onclick="closeModal()">Tutup</button>
-                        </div>
-                    </div>
-                @endif
+        {{-- Main Content --}}
+        <main>
+            {{-- Hero Section --}}
+            <div class="hero">
+                <h2>Unearth Dino Puzzles!</h2>
+                <p>Join other young explorers on exciting dinosaur puzzle adventures!</p>
             </div>
-        </form>
+
+            {{-- Game Buttons --}}
+            <div class="game-buttons">
+                <a href="{{ route('gallery.index') }}">
+                    <button class="play-btn">DIG NOW!</button>
+                </a>
+
+                {{-- Join Section --}}
+                <div class="join-section">
+                    <p>Or join a friend's expedition:</p>
+                    <form action="{{ route('room.join') }}" method="POST" class="join-form">
+                        @csrf
+                        <input type="text" name="code" class="passcode-input" placeholder="Enter friend's dig site code" required>
+                        <button type="submit" class="join-btn">JOIN DIG</button>
+                    </form>
+                </div>
+            </div>
+
+            {{-- Feature Cards --}}
+            <div class="features">
+                {{-- Repeat for each feature --}}
+                <div class="feature-card">
+                    <div class="feature-icon"><img src="/api/placeholder/45/45" alt="Icon"></div>
+                    <h3 class="feature-title">Fun Puzzles</h3>
+                    <p class="feature-text">Piece together amazing dinosaur fossils!</p>
+                </div>
+            </div>
+        </main>
+
+        {{-- Footer --}}
+        <footer>
+            <p>© 2025 DinoMatch - Uncovering Prehistoric Mysteries!</p>
+        </footer>
     </div>
 
+    {{-- Modal Handling --}}
+    @if (!Session::has('user'))
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <h2>Gabung Room</h2>
+            <input type="text" name="username" placeholder="Nama Anda" required value="{{ session('player.username') }}">
+            <button type="submit" form="form-join">Gabung</button>
+            <button class="btn-close" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
+    @endif
+
+    {{-- JavaScript --}}
     <script>
-        document.getElementById('form-join').addEventListener('submit', function(event) {
-            document.getElementById('submitButton').disabled = true;
-        }, {
-            once: true
+        // Keep existing JS functionality
+        document.getElementById('form-join')?.addEventListener('submit', function() {
+            this.querySelector('button[type="submit"]').disabled = true;
         });
 
         function openModal() {
-            document.getElementById("myModal").style.display = "block";
+            document.getElementById('myModal').style.display = 'block';
         }
 
         function closeModal() {
-            document.getElementById("myModal").style.display = "none";
+            document.getElementById('myModal').style.display = 'none';
         }
-        // Tutup modal jika klik di luar area modal
+
         window.onclick = function(event) {
-            let modal = document.getElementById("myModal");
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+            const modal = document.getElementById('myModal');
+            if (event.target === modal) closeModal();
         }
     </script>
 </body>
