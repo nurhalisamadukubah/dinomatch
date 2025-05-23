@@ -8,6 +8,7 @@ use App\Models\Player;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -185,11 +186,8 @@ class RoomController extends Controller
                 'level' => 0
             ]);
 
-            return redirect()->route('room.show', [
-                'code' => $room->code,
-                'username' => Session::get('user')->username,
-                'player_id' => $userId,
-                'gallery_id' => $room->gallery_id
+            return redirect()->route('room.login', [
+                'code' => $room->code
             ]);
         }
 
@@ -216,6 +214,37 @@ class RoomController extends Controller
             'player_id' => $player->id,
             'gallery_id' => $room->gallery_id
         ]);
+    }
+
+    public function roomLogin(Request $request)
+    {
+        $room = Room::where('code', $request->code)->first();
+        $user = User::where('username', $request->username)->first();
+
+        $total = $room->players()->count() + $room->users()->count();
+        if ($total >= 2) {
+            return back()->withErrors(['error' => 'Room sudah penuh']);
+        }
+
+        if ($user && Hash::check($request->password, $user->password)) {
+            // Set session
+            Session::put('user', $user);
+
+            $userId = Session::get('user')->id;
+            User::find($userId)->update([
+                'room_id' => $room->id,
+                'level' => 0
+            ]);
+
+            return redirect()->route('room.show', [
+                'code' => $room->code,
+                'username' => Session::get('user')->username,
+                'player_id' => $userId,
+                'gallery_id' => $room->gallery_id
+            ]);
+        }
+
+        return back()->withErrors(['username' => 'Username atau password salah!']);
     }
 
     // Menampilkan room

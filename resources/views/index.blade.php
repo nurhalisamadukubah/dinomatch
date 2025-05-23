@@ -48,17 +48,17 @@
 
             {{-- Game Buttons --}}
             <div class="game-buttons">
-                <a href="{{ route('gallery.index') }}">
-                    <button class="play-btn">DIG NOW!</button>
+                <a href="{{ route('login') }}">
+                    <button class="play-btn">PLAY NOW!</button>
                 </a>
 
                 {{-- Join Section --}}
                 <div class="join-section">
                     <p>Or join a friend's expedition:</p>
-                    <form action="{{ route('room.join') }}" method="POST" class="join-form">
+                    <form action="{{ route('room.login') }}" method="POST" class="join-form">
                         @csrf
-                        <input type="text" name="code" class="passcode-input" placeholder="Enter friend's dig site code" required>
-                        <button type="submit" class="join-btn">JOIN DIG</button>
+                        <input type="text" name="code" class="passcode-input" placeholder="Enter friend's pass code" required>
+                        <button type="submit" class="join-btn">PLAY</button>
                     </form>
                 </div>
             </div>
@@ -81,7 +81,7 @@
     </div>
 
     {{-- Modal Handling --}}
-    @if (!Session::has('user'))
+    {{-- @if (!Session::has('user'))
     <div id="myModal" class="modal">
         <div class="modal-content">
             <h2>Gabung Room</h2>
@@ -90,27 +90,27 @@
             <button class="btn-close" onclick="closeModal()">Tutup</button>
         </div>
     </div>
-    @endif
+    @endif --}}
 
     {{-- JavaScript --}}
     <script>
         // Keep existing JS functionality
-        document.getElementById('form-join')?.addEventListener('submit', function() {
-            this.querySelector('button[type="submit"]').disabled = true;
-        });
+        // document.getElementById('form-join')?.addEventListener('submit', function() {
+        //     this.querySelector('button[type="submit"]').disabled = true;
+        // });
 
-        function openModal() {
-            document.getElementById('myModal').style.display = 'block';
-        }
+        // function openModal() {
+        //     document.getElementById('myModal').style.display = 'block';
+        // }
 
-        function closeModal() {
-            document.getElementById('myModal').style.display = 'none';
-        }
+        // function closeModal() {
+        //     document.getElementById('myModal').style.display = 'none';
+        // }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('myModal');
-            if (event.target === modal) closeModal();
-        }
+        // window.onclick = function(event) {
+        //     const modal = document.getElementById('myModal');
+        //     if (event.target === modal) closeModal();
+        // }
     </script>
 </body>
 

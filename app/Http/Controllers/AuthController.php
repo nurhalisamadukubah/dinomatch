@@ -52,7 +52,7 @@ class AuthController extends Controller
             // Set session
             Session::put('user', $user);
 
-            return redirect('/');
+            return redirect('/gallery');
         }
 
         return back()->withErrors(['username' => 'Username atau password salah!']);

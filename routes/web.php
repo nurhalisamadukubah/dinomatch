@@ -16,11 +16,11 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/', function () {
-    if (!Session::has('user')) {
-        return redirect('/login')->withErrors(['unauthorized' => 'Silakan login terlebih dahulu!']);
-    } else {
+    // if (!Session::has('user')) {
+    //     return redirect('/login')->withErrors(['unauthorized' => 'Silakan login terlebih dahulu!']);
+    // } else {
         return view('index');
-    }
+    // }
 });
 
 Route::get('/room', function () {
@@ -33,6 +33,7 @@ Route::get('/gallery', [RoomController::class, 'gallery'])->name('gallery.index'
 Route::post('/room/create', [RoomController::class, 'createRoom'])->name('room.create');
 Route::post('/room/join', [RoomController::class, 'joinRoom'])->name('room.join');
 Route::get('/room/{code}', [RoomController::class, 'showRoom'])->name('room.show');
+Route::get('/roomLogin', [RoomController::class, 'roomLogin'])->name('room.login');
 Route::get('/room/{code}/players', [RoomController::class, 'getPlayers'])->name('room.players');
 Route::get('/room/{room}/countdown-time', [RoomController::class, 'getCountdownTime'])->name('room.countdown-time');
 Route::get('/room/{code}/data', [RoomController::class, 'getRoomData']);
