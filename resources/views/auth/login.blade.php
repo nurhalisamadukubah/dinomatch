@@ -88,7 +88,14 @@
     <div class="container">
         <h1>Welcome to Puzzle Game</h1>
         <p>Login untuk memulai permainan atau masuk sebagai tamu!</p>
-        <form method="POST" action="{{ route('login.post') }}">
+        @if (request()->is('login'))
+            <form method="POST" action="{{ route('login.post') }}">
+        @elseif (request()->is('login/profile'))
+            <form method="POST" action="{{ route('profile.post') }}">
+        @elseif (request()->is('login/join'))
+            <form method="POST" action="{{ route('join.post') }}">
+                <input type="hidden" value="{{ $code }}" name="code">
+        @endif
             @csrf
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" placeholder="Masukkan username Anda" required>
@@ -96,7 +103,7 @@
             <input type="password" id="password" name="password" placeholder="Masukkan password Anda" required>
             <button type="submit">Login</button>
         </form>
-        <a href="{{ route('room.index') }}">Masuk sebagai Tamu</a>
+        {{-- <a href="{{ route('room.index') }}">Masuk sebagai Tamu</a> --}}
     </div>
 </body>
 </html>

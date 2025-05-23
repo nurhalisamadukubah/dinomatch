@@ -12,6 +12,10 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::get('/login/profile', [AuthController::class, 'showLogin'])->name('login.profile');
+Route::post('/login/profile', [RoomController::class, 'profile'])->name('profile.post');
+Route::post('/login/join', [AuthController::class, 'showJoin'])->name('login.join');
+Route::post('/login/join/post', [RoomController::class, 'roomLogin'])->name('join.post');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 

@@ -38,6 +38,12 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function showJoin(Request $request)
+    {
+        $code = $request->code;
+        return view('auth.login', compact(['code']));
+    }
+
     // Proses login
     public function login(Request $request)
     {

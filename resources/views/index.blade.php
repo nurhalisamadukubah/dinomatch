@@ -30,7 +30,7 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="{{ route('profile.index', ['id' => session('player.id') ?? 0]) }}">My Dig Site</a></li>
+                    <li><a href="{{ route('login.profile') }}">My Dig Site</a></li>
                     <li><a href="{{ route('galleries.index', ['id' => session('player.id') ?? 0]) }}">Dinopedia</a></li>
                     <li><a href="{{ route('tutorial.index') }}">How To Play</a></li>
                     <li><a href="{{ route('about.index') }}">About</a></li>
@@ -55,7 +55,7 @@
                 {{-- Join Section --}}
                 <div class="join-section">
                     <p>Or join a friend's expedition:</p>
-                    <form action="{{ route('room.login') }}" method="POST" class="join-form">
+                    <form action="{{ route('login.join') }}" method="POST" class="join-form">
                         @csrf
                         <input type="text" name="code" class="passcode-input" placeholder="Enter friend's pass code" required>
                         <button type="submit" class="join-btn">PLAY</button>
