@@ -98,32 +98,45 @@ class RoomController extends Controller
     public function roomLogin(Request $request)
     {
         $room = Room::where('code', $request->code)->first();
-        $user = User::where('username', $request->username)->first();
 
+        if (!$room) {
+            return back()->withErrors(['error' => 'Room tidak ditemukan']);
+        }
+
+        // Hitung jumlah player di room
         $total = $room->users()->count();
         if ($total >= 2) {
             return back()->withErrors(['error' => 'Room sudah penuh']);
         }
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            // Set session
+        // Ambil user dari session jika sudah login
+        if (Session::has('user')) {
+            $user = Session::get('user');
+        } else {
+            // Validasi login jika belum login
+            $user = User::where('username', $request->username)->first();
+
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return back()->withErrors(['username' => 'Username atau password salah!']);
+            }
+
+            // Simpan ke session
             Session::put('user', $user);
-
-            $userId = Session::get('user')->id;
-            User::find($userId)->update([
-                'room_id' => $room->id,
-                'level' => 0
-            ]);
-
-            return redirect()->route('room.show', [
-                'code' => $room->code,
-                'username' => Session::get('user')->username,
-                'player_id' => $userId,
-                'gallery_id' => $room->gallery_id
-            ]);
         }
 
-        return back()->withErrors(['username' => 'Username atau password salah!']);
+        // Update user dengan room_id dan level
+        $userId = $user->id;
+        User::find($userId)->update([
+            'room_id' => $room->id,
+            'level' => 0
+        ]);
+
+        return redirect()->route('room.show', [
+            'code' => $room->code,
+            'username' => $user->username,
+            'player_id' => $userId,
+            'gallery_id' => $room->gallery_id
+        ]);
     }
 
     // Menampilkan room
@@ -217,50 +230,55 @@ class RoomController extends Controller
 
     public function profile(Request $request)
     {
-        $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-        ]);
+        // Jika user sudah login (ada di session), ambil dari session
+        if (Session::has('user')) {
+            $user = Session::get('user');
+        } else {
+            // Validasi input jika belum login
+            $request->validate([
+                'username' => 'required',
+                'password' => 'required',
+            ]);
 
-        $user = User::where('username', $request->username)->first();
+            $user = User::where('username', $request->username)->first();
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            // Set session
-            Session::put('user', $user);
-
-            $player = GameResult::with(['user', 'player', 'room'])->where('user_id', $user->id)->first();
-
-            // Inisialisasi variabel kosong jika player tidak ditemukan
-            $results = collect();
-            $resultsPerRound = collect();
-
-            if ($player && $player->room_id) {
-                $results = GameResult::with(['player', 'user', 'room'])
-                    ->where('room_id', $player->room_id)
-                    ->latest()
-                    ->get();
-
-                $groupedByRound = $results->groupBy('round');
-
-                $resultsPerRound = $groupedByRound->map(function ($roundGroup) {
-                    $sorted = $roundGroup->sortBy([
-                        ['correct_pieces', 'desc'],
-                        ['time_taken', 'asc']
-                    ]);
-
-                    $winner = $sorted->first();
-                    $losers = $sorted->slice(1)->values();
-
-                    return [
-                        'winner' => $winner,
-                        'losers' => $losers,
-                    ];
-                });
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return redirect()->route('room.index')->with('error', 'Player tidak ditemukan atau password salah.');
             }
 
-            return view('profile', compact(['results', 'player', 'user', 'resultsPerRound']));
+            // Set session jika login berhasil
+            Session::put('user', $user);
         }
 
-        return redirect()->route('room.index')->with('error', 'Player tidak ditemukan atau password salah.');
+        $player = GameResult::with(['user', 'player', 'room'])->where('user_id', $user->id)->first();
+
+        $results = collect();
+        $resultsPerRound = collect();
+
+        if ($player && $player->room_id) {
+            $results = GameResult::with(['player', 'user', 'room'])
+                ->where('room_id', $player->room_id)
+                ->latest()
+                ->get();
+
+            $groupedByRound = $results->groupBy('round');
+
+            $resultsPerRound = $groupedByRound->map(function ($roundGroup) {
+                $sorted = $roundGroup->sortBy([
+                    ['correct_pieces', 'desc'],
+                    ['time_taken', 'asc']
+                ]);
+
+                $winner = $sorted->first();
+                $losers = $sorted->slice(1)->values();
+
+                return [
+                    'winner' => $winner,
+                    'losers' => $losers,
+                ];
+            });
+        }
+
+        return view('profile', compact(['results', 'player', 'user', 'resultsPerRound']));
     }
 }

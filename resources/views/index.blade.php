@@ -30,7 +30,11 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="{{ route('login.profile') }}">My Dig Site</a></li>
+                    @if (Session::has('user'))
+                        <li><a href="{{ route('profile.index') }}">My Dig Site</a></li>
+                    @else
+                        <li><a href="{{ route('login.profile') }}">My Dig Site</a></li>
+                    @endif
                     <li><a href="{{ route('galleries.index', ['id' => session('player.id') ?? 0]) }}">Dinopedia</a></li>
                     <li><a href="{{ route('tutorial.index') }}">How To Play</a></li>
                     <li><a href="{{ route('about.index') }}">About</a></li>
@@ -48,14 +52,23 @@
 
             {{-- Game Buttons --}}
             <div class="game-buttons">
-                <a href="{{ route('login') }}">
-                    <button class="play-btn">PLAY NOW!</button>
-                </a>
-
+                @if (Session::has('user'))
+                    <a href="{{ route('gallery.index') }}">
+                        <button class="play-btn">PLAY NOW!</button>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}">
+                        <button class="play-btn">PLAY NOW!</button>
+                    </a>
+                @endif
                 {{-- Join Section --}}
                 <div class="join-section">
                     <p>Or join a friend's expedition:</p>
-                    <form action="{{ route('login.join') }}" method="POST" class="join-form">
+                    @if (Session::has('user'))
+                        <form action="{{ route('join.post') }}" method="POST" class="join-form">
+                    @else
+                        <form action="{{ route('login.join') }}" method="POST" class="join-form">
+                    @endif
                         @csrf
                         <input type="text" name="code" class="passcode-input" placeholder="Enter friend's pass code" required>
                         <button type="submit" class="join-btn">PLAY</button>

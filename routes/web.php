@@ -57,4 +57,4 @@ Route::get('/detail/{id}', [GalleryController::class, 'show'])->name('galleries.
 
 Route::get('/tutorial', [RoomController::class, 'tutorial'])->name('tutorial.index');
 Route::get('/about', [RoomController::class, 'about'])->name('about.index');
-Route::get('/profile/{id}', [RoomController::class, 'profile'])->name('profile.index');
+Route::get('/profile', [RoomController::class, 'profile'])->name('profile.index');

@@ -598,7 +598,6 @@
             <div class="login-container">
                 <div class="login-header">
                     <h2 class="login-title">LOGIN</h2>
-                    <p class="login-subtitle">Masuk untuk memulai pencarian fosil!</p>
                 </div>
 
                 <!-- Form with PHP Logic -->
@@ -627,21 +626,9 @@
                         </div>
                     </div>
 
-                    <!-- Remember Me Checkbox -->
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="remember" class="checkbox-input" name="remember">
-                        <label for="remember" class="checkbox-label">Ingat Saya</label>
-                    </div>
-
                     <!-- Submit Button -->
                     <button type="submit" class="login-btn">Mulai Bermain!</button>
                 </form>
-
-                <!-- Additional Options -->
-                <div class="login-options">
-                    <a href="#" class="forgot-password">Lupa Password?</a>
-                    <a href="#" class="signup-link">Daftar Akun Baru</a>
-                </div>
             </div>
         </main>
     </div>

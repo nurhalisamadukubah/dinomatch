@@ -1,66 +1,920 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tentang Ensiklopedia Dinosaurus</title>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Bubblegum+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <title>DinoMatch - Tentang</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            text-align: center;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #e6d2b5;
+        background-image: radial-gradient(
+            circle at 20% 20%,
+            rgba(218, 165, 32, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(58, 77, 57, 0.1) 0%,
+            transparent 50%
+          ),
+          url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23734f30" opacity="0.1"/><circle cx="80" cy="40" r="1.5" fill="%23daa520" opacity="0.1"/><circle cx="60" cy="80" r="1" fill="%233a4d39" opacity="0.1"/></svg>');
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+        position: relative;
+        font-family: "Cabin", sans-serif;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("/api/placeholder/1920/1080") center/cover;
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: -2;
+      }
+
+      /* Animated background elements */
+      .bg-leaves {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+      }
+
+      .leaf {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: url("/api/placeholder/30/30") no-repeat center;
+        background-size: contain;
+        opacity: 0.1;
+        animation: float 8s ease-in-out infinite;
+      }
+
+      .leaf:nth-child(1) {
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .leaf:nth-child(2) {
+        top: 30%;
+        left: 80%;
+        animation-delay: 1s;
+      }
+      .leaf:nth-child(3) {
+        top: 60%;
+        left: 20%;
+        animation-delay: 2s;
+      }
+      .leaf:nth-child(4) {
+        top: 80%;
+        left: 70%;
+        animation-delay: 3s;
+      }
+      .leaf:nth-child(5) {
+        top: 20%;
+        left: 50%;
+        animation-delay: 4s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
         }
+        25% {
+          transform: translateY(-10px) rotate(5deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(-5deg);
+        }
+        75% {
+          transform: translateY(-10px) rotate(3deg);
+        }
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+      }
+
+      /* Header section */
+      .header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #3a4d39;
+        border-radius: 25px;
+        padding: 15px 20px;
+        border: 5px solid #daa520;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url("/api/placeholder/100/100") repeat;
+        opacity: 0.05;
+        animation: rotate 30s linear infinite;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .back-button {
+        background: linear-gradient(135deg, #734f30, #8b5a2b);
+        color: #fff;
+        border: 3px solid #daa520;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        font-size: 32px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 25px;
+        box-shadow: 0 6px 0 #5a3e24, 0 10px 20px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        font-family: "Bubblegum Sans", cursive;
+      }
+
+      .back-button:hover {
+        transform: translateY(-5px) scale(1.1);
+        box-shadow: 0 11px 0 #5a3e24, 0 15px 25px rgba(0, 0, 0, 0.4);
+      }
+
+      .back-button:active {
+        transform: translateY(2px);
+        box-shadow: 0 4px 0 #5a3e24, 0 6px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      .page-title {
+        flex-grow: 1;
+        text-align: center;
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 48px;
+        font-weight: 700;
+        color: #daa520;
+        text-shadow: 3px 3px 0 #331a00, -1px -1px 0 #331a00, 1px -1px 0 #331a00,
+          -1px 1px 0 #331a00;
+        position: relative;
+        z-index: 2;
+        letter-spacing: 2px;
+      }
+
+      /* Main content */
+      .main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        flex: 1;
+      }
+
+      /* Hero section */
+      .hero-section {
+        background: linear-gradient(
+          135deg,
+          rgba(248, 244, 230, 0.95),
+          rgba(230, 210, 181, 0.95)
+        );
+        border-radius: 30px;
+        padding: 40px;
+        border: 6px solid #734f30;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        transform: rotate(-0.5deg);
+      }
+
+      .hero-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("/api/placeholder/200/200") no-repeat;
+        background-position: bottom right;
+        background-size: 15%;
+        opacity: 0.05;
+        pointer-events: none;
+      }
+
+      .hero-section::after {
+        content: "🧩";
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        font-size: 50px;
+        filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.3));
+        animation: wiggle 4s ease-in-out infinite;
+      }
+
+      @keyframes wiggle {
+        0%,
+        100% {
+          transform: rotate(-15deg);
+        }
+        50% {
+          transform: rotate(15deg);
+        }
+      }
+
+      .game-logo {
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 72px;
+        font-weight: 700;
+        color: #3a4d39;
+        text-shadow: 4px 4px 0 #daa520, -2px -2px 0 #daa520, 2px -2px 0 #daa520,
+          -2px 2px 0 #daa520;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .game-subtitle {
+        font-family: "Cabin", sans-serif;
+        font-size: 24px;
+        color: #734f30;
+        margin-bottom: 30px;
+        font-weight: 600;
+        font-style: italic;
+      }
+
+      .game-description {
+        font-family: "Cabin", sans-serif;
+        font-size: 18px;
+        line-height: 1.8;
+        color: #3a4d39;
+        max-width: 900px;
+        margin: 0 auto;
+        font-weight: 500;
+      }
+
+      /* Content sections */
+      .content-section {
+        background: linear-gradient(
+          135deg,
+          rgba(248, 244, 230, 0.95),
+          rgba(230, 210, 181, 0.95)
+        );
+        border-radius: 25px;
+        padding: 35px;
+        border: 5px solid #734f30;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .content-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("/api/placeholder/100/100") repeat;
+        opacity: 0.03;
+        pointer-events: none;
+      }
+
+      .section-title {
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 36px;
+        font-weight: 700;
+        color: #3a4d39;
+        text-shadow: 2px 2px 0 #daa520, -1px -1px 0 #daa520, 1px -1px 0 #daa520,
+          -1px 1px 0 #daa520;
+        margin-bottom: 25px;
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .section-content {
+        font-family: "Cabin", sans-serif;
+        font-size: 16px;
+        line-height: 1.7;
+        color: #3a4d39;
+        position: relative;
+        z-index: 2;
+        font-weight: 500;
+      }
+
+      .section-content p {
+        margin-bottom: 20px;
+      }
+
+      .section-content p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Developer section */
+      .developer-section {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        transform: rotate(0.5deg);
+      }
+
+      .developer-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 20px;
+        border: 5px solid #734f30;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(135deg, #f8f4e6, #e6d2b5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 80px;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .developer-avatar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.4) 0%,
+          rgba(255, 255, 255, 0) 60%
+        );
+        pointer-events: none;
+      }
+
+      .developer-info {
+        flex: 1;
+      }
+
+      .developer-name {
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 32px;
+        font-weight: 700;
+        color: #3a4d39;
+        margin-bottom: 10px;
+      }
+
+      .developer-role {
+        font-family: "Cabin", sans-serif;
+        font-size: 18px;
+        color: #734f30;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-style: italic;
+      }
+
+      /* Features grid */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 25px;
+      }
+
+      .feature-card {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(248, 244, 230, 0.9)
+        );
+        border-radius: 20px;
+        padding: 25px;
+        border: 4px solid #daa520;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(218, 165, 32, 0.1) 50%,
+          transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .feature-card:hover::before {
+        opacity: 1;
+      }
+
+      .feature-icon {
+        font-size: 50px;
+        margin-bottom: 15px;
+        display: block;
+        filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+      }
+
+      .feature-title {
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 22px;
+        font-weight: 700;
+        color: #3a4d39;
+        margin-bottom: 10px;
+      }
+
+      .feature-description {
+        font-family: "Cabin", sans-serif;
+        font-size: 14px;
+        color: #734f30;
+        font-weight: 500;
+        line-height: 1.5;
+      }
+
+      /* Credits section */
+      .credits-section {
+        background: linear-gradient(135deg, #3a8559, #2d6b44);
+        color: white;
+        transform: rotate(-0.3deg);
+      }
+
+      .credits-section::before {
+        background: url("/api/placeholder/100/100") repeat;
+        opacity: 0.1;
+      }
+
+      .credits-section .section-title {
+        color: #daa520;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .credits-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .credit-item {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 20px;
+        border: 2px solid rgba(218, 165, 32, 0.5);
+        text-align: center;
+      }
+
+      .credit-role {
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #daa520;
+      }
+
+      .credit-name {
+        font-family: "Cabin", sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      /* Decorative elements */
+      .floating-fossil {
+        position: absolute;
+        z-index: 0;
+        opacity: 0.08;
+        pointer-events: none;
+        animation: float 8s ease-in-out infinite;
+      }
+
+      .fossil-1 {
+        top: 10%;
+        left: 5%;
+        width: 120px;
+        height: 120px;
+        transform: rotate(-20deg);
+        animation-delay: 0s;
+      }
+
+      .fossil-2 {
+        bottom: 20%;
+        right: 8%;
+        width: 140px;
+        height: 100px;
+        transform: rotate(25deg);
+        animation-delay: 2s;
+      }
+
+      .fossil-3 {
+        top: 40%;
+        right: 15%;
+        width: 100px;
+        height: 100px;
+        transform: rotate(-15deg);
+        animation-delay: 4s;
+      }
+
+      .fossil-4 {
+        bottom: 10%;
+        left: 12%;
+        width: 110px;
+        height: 90px;
+        transform: rotate(30deg);
+        animation-delay: 6s;
+      }
+
+      /* Media Queries */
+      @media (max-width: 1024px) {
+        .developer-section {
+          flex-direction: column;
+          text-align: center;
+          transform: rotate(0deg);
+        }
+
+        .features-grid {
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .floating-fossil {
+          opacity: 0.05;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .page-title {
+          font-size: 36px;
+        }
+
+        .game-logo {
+          font-size: 56px;
+        }
+
+        .hero-section {
+          transform: rotate(0deg);
+          padding: 30px;
+        }
+
+        .content-section {
+          padding: 25px;
+          transform: rotate(0deg) !important;
+        }
+
+        .section-title {
+          font-size: 28px;
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .developer-avatar {
+          width: 120px;
+          height: 120px;
+          font-size: 60px;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
         .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+          padding: 15px;
         }
-        h1 {
-            color: #16a34a;
+
+        .page-title {
+          font-size: 28px;
         }
-        p {
-            color: #666;
-            line-height: 1.6;
+
+        .game-logo {
+          font-size: 42px;
         }
-        .button {
-            background: #16a34a;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            display: inline-block;
-            border-radius: 5px;
-            margin-top: 20px;
-            cursor: pointer;
-            border: none;
-            font-size: 1rem;
+
+        .hero-section {
+          padding: 25px;
         }
-        .button:hover {
-            background: #15803d;
+
+        .content-section {
+          padding: 20px;
         }
+
+        .section-title {
+          font-size: 24px;
+        }
+
+        .floating-fossil {
+          display: none;
+        }
+
+        .leaf {
+          display: none;
+        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="bg-leaves">
+      <div class="leaf"></div>
+      <div class="leaf"></div>
+      <div class="leaf"></div>
+      <div class="leaf"></div>
+      <div class="leaf"></div>
+    </div>
+
+    <img
+      src="/api/placeholder/120/120"
+      alt="Floating fossil"
+      class="floating-fossil fossil-1"
+    />
+    <img
+      src="/api/placeholder/140/100"
+      alt="Floating fossil"
+      class="floating-fossil fossil-2"
+    />
+    <img
+      src="/api/placeholder/100/100"
+      alt="Floating fossil"
+      class="floating-fossil fossil-3"
+    />
+    <img
+      src="/api/placeholder/110/90"
+      alt="Floating fossil"
+      class="floating-fossil fossil-4"
+    />
 
     <div class="container">
-        <h1 id="title">Tentang Ensiklopedia Dinosaurus</h1>
-        <p id="description">
-            Ensiklopedia Dinosaurus adalah aplikasi interaktif yang memberikan informasi mendalam tentang berbagai jenis dinosaurus.
-            Kami ingin mengajak pengguna untuk belajar sambil bermain dengan teka-teki dan fakta menarik seputar dunia prasejarah.
-        </p>
-        <button class="button" onclick="changeContent()">Pelajari Lebih Lanjut</button>
+      <div class="header">
+        <a href="{{ route('room.index') }}" style="text-decoration: none;"><button class="back-button">←</button></a>
+        <h1 class="page-title">TENTANG</h1>
+      </div>
+
+      <div class="main-content">
+        <!-- Hero Section -->
+        <div class="hero-section">
+          <div class="game-logo">DINOMATCH</div>
+          <div class="game-subtitle">Tantangan Puzzle Menantimu!</div>
+          <div class="game-description">
+            Mulailah eksplorasi seru menyusun puzzle dan ungkap fakta-fakta
+            menarik tentang dinosaurus — hewan dari masa lalu yang selalu seru
+            untuk dikenali! DinoMatch menghadirkan perpaduan unik antara bermain
+            dan belajar, dengan tema eksplorasi dinosaurus yang dikemas dalam
+            gameplay kompetitif. Cocokkan kepingan, tantang teman, dan kumpulkan
+            berbagai informasi seru tentang beragam spesies dinosaurus dalam
+            pengalaman yang edukatif dan penuh tantangan!
+          </div>
+        </div>
+
+        <!-- Game Features -->
+        <div class="content-section">
+          <h2 class="section-title">🎮 GAME FEATURES</h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <span class="feature-icon">🧩</span>
+              <div class="feature-title">Selesaikan Puzzle</div>
+              <div class="feature-description">
+                Susun kepingan puzzle acak yang diacak dengan algoritma Salsa20.
+                Uji kemampuanmu dan taklukkan setiap tingkatan puzzle!
+              </div>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">⚔️</span>
+              <div class="feature-title">Pertandingan Seru</div>
+              <div class="feature-description">
+                Ajak temanmu bertanding! Tantang mereka untuk menyelesaikan
+                puzzle lebih cepat dan raih hadiah kemenangan!.
+              </div>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">⏱️</span>
+              <div class="feature-title">Time Attack</div>
+              <div class="feature-description">
+                Berpacu dengan waktu! Tunjukkan kecepatan dan ketepatanmu dalam
+                menyusun puzzle sebelum waktu habis.
+              </div>
+            </div>
+            <div class="feature-card">
+              <span class="feature-icon">🦖</span>
+              <div class="feature-title">Kumpulkan Dinosaurus</div>
+              <div class="feature-description">
+                Temukan dan kumpulkan 10 spesies dinosaurus unik yang
+                masing-masing dengan karakteristik dan kemampuan spesial!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- About the Game -->
+        <div class="content-section">
+          <h2 class="section-title">🌍 THE STORY</h2>
+          <div class="section-content">
+            <p>
+              Selamat datang di DinoMatch, sebuah permainan seru di mana
+              menyusun puzzle bukan hanya menyenangkan, tapi juga mengungkap
+              berbagai fakta menarik tentang dinosaurus — hewan purba yang
+              selalu seru untuk dikenali! Dalam game ini, kamu akan menyusun
+              potongan-potongan puzzle untuk membuka informasi unik tentang
+              dinosaurus.
+            </p>
+
+            <p>
+              Bangun pengetahuanmu tentang beragam spesies dinosaurus dengan
+              tantangan 10 puzzle seru yang harus kamu selesaikan. Setiap
+              tantangan membawa kamu lebih dekat untuk mengenal dinosaurus
+              dengan berbagai keunikan, mulai dari yang paling terkenal hingga
+              yang jarang diketahui!
+            </p>
+
+            <p>
+              Dengan konsep bermain sambil belajar, DinoMatch menggabungkan
+              keseruan mencocokkan puzzle dengan kompetisi yang seru. Kamu bisa
+              bertanding dengan teman, mengasah kecepatan dan ketepatan, serta
+              mengumpulkan informasi seru dari setiap spesies yang kamu temukan.
+            </p>
+
+            <p>
+              Ayo ajak temanmu, selesaikan semua tantangan, mulai petualangan
+              edukatifmu di DinoMatch!
+            </p>
+          </div>
+        </div>
+
+        <!-- Developer Section -->
+        <div class="content-section developer-section">
+          <div class="developer-avatar">👩‍💻</div>
+          <div class="developer-info">
+            <h2 class="section-title">💡 MEET THE GAME MASTER</h2>
+            <div class="developer-name">Nurhalisa Madukubah</div>
+            <div class="developer-role">E1E1 19 035</div>
+            <div class="section-content">
+              <p>
+                "Pada dasarnya, DinoMatch yang merupakan permainan puzzle
+                berbasis website yang mengkolaborasikan tema dinosaurus dan
+                mekanisme permainan puzzle ini dirancang dan dibangun karena
+                saya ingin lulus 🙏"
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credits -->
+        <div class="content-section credits-section">
+          <h2 class="section-title">🐎 EXPLORATION CREDITS</h2>
+          <div class="credits-list">
+            <div class="credit-item">
+              <div class="credit-role">💵 Grant Fund Foundation 👑</div>
+              <div class="credit-name">Kakalan Bapaknya Shaquille</div>
+            </div>
+            <div class="credit-item">
+              <div class="credit-role">💻 BE Developer</div>
+              <div class="credit-name">Rex Leo, C.Gpt</div>
+            </div>
+            <div class="credit-item">
+              <div class="credit-role">🎨 Game Designer</div>
+              <div class="credit-name">Claude Sonnet, M.Ai</div>
+            </div>
+            <div class="credit-item">
+              <div class="credit-role">🖌️ Art Director</div>
+              <div class="credit-name">Google, S.Eng</div>
+            </div>
+            <div class="credit-item">
+              <div class="credit-role">🔊 Sound Engineer</div>
+              <div class="credit-name">Pixabay de Khinsider, D.Load</div>
+            </div>
+            <div class="credit-item">
+              <div class="credit-role">🦖 Paleontology Consultant</div>
+              <div class="credit-name">
+                Natural History Museum and Jurassic World Evolution Wiki
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="section-content"
+            style="margin-top: 30px; text-align: center"
+          >
+            <p>
+              <strong>Special Thanks: </strong>Para Hamba Allah yang Mendo'akan
+              Saya.
+            </p>
+
+            <p style="margin-top: 20px; font-style: italic">
+              <strong
+                >"Sesungguhnya Kemampuan Manusia adalah Kehendak Allah." </strong
+              >- Nur, Mahasiswi yang hanya ingin lulus.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
-        function changeContent() {
-            document.getElementById("title").innerText = "Tujuan Ensiklopedia Dinosaurus";
-            document.getElementById("description").innerText = "Kami bertujuan untuk membuat pembelajaran tentang dinosaurus lebih menyenangkan dan interaktif melalui game dan konten edukatif.";
-        }
-    </script>
+      // Feature cards hover effects
+      document.querySelectorAll(".feature-card").forEach((card) => {
+        card.addEventListener("mouseenter", function () {
+          const icon = this.querySelector(".feature-icon");
+          icon.style.transform = "scale(1.2) rotate(10deg)";
+        });
 
-</body>
+        card.addEventListener("mouseleave", function () {
+          const icon = this.querySelector(".feature-icon");
+          icon.style.transform = "scale(1) rotate(0deg)";
+        });
+      });
+
+      // Developer avatar click effect
+      document
+        .querySelector(".developer-avatar")
+        .addEventListener("click", function () {
+          this.style.transform = "scale(1.1) rotate(360deg)";
+          setTimeout(() => {
+            this.style.transform = "scale(1) rotate(0deg)";
+          }, 600);
+        });
+
+      // Credits animation on scroll into view
+      const observerOptions = {
+        threshold: 0.3,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const creditItems = entry.target.querySelectorAll(".credit-item");
+            creditItems.forEach((item, index) => {
+              setTimeout(() => {
+                item.style.transform = "translateY(0) scale(1)";
+                item.style.opacity = "1";
+              }, index * 100);
+            });
+          }
+        });
+      }, observerOptions);
+
+      // Initialize credit items as hidden
+      document.querySelectorAll(".credit-item").forEach((item) => {
+        item.style.transform = "translateY(30px) scale(0.8)";
+        item.style.opacity = "0";
+        item.style.transition = "all 0.5s ease";
+      });
+
+      // Observe credits section
+      const creditsSection = document.querySelector(".credits-section");
+      if (creditsSection) {
+        observer.observe(creditsSection);
+      }
+    </script>
+  </body>
 </html>
