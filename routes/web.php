@@ -49,6 +49,11 @@ Route::get('/checkAllPlayersFinished/{room_id}/{round}', [GameController::class,
 Route::post('/updateLevel/{playerId}', [GameController::class, 'updateUserLevel']);
 Route::get('/getUserData/{userId}', [GameController::class, 'getUserData']);
 Route::post('/resetWins/{playerId}', [GameController::class, 'resetWins']);
+// Route untuk menyimpan hasil match
+Route::post('/saveMatchResult', [GameController::class, 'saveMatchResult']);
+
+// Route untuk mengecek pemenang match
+Route::get('/getMatchWinner/{room_id}', [GameController::class, 'getMatchWinner']);
 
 Route::resource('galleries', GalleryController::class);
 Route::get('/showGalleries/{id}', [GalleryController::class, 'index'])->name('galleries.index');

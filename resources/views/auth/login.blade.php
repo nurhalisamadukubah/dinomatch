@@ -575,7 +575,7 @@
         <header>
             <div class="header-content">
                 <div class="logo">
-                    <img src="/api/placeholder/70/70" alt="DinoMatch Logo">
+                    {{-- <img src="/api/placeholder/70/70" alt="DinoMatch Logo"> --}}
                     <h1>DinoMatch</h1>
                 </div>
                 <nav>

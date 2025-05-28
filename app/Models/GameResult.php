@@ -9,12 +9,12 @@ class GameResult extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['player_id', 'room_id', 'user_id', 'correct_pieces', 'time_taken', 'round'];
+    protected $fillable = ['room_id', 'user_id', 'correct_pieces', 'time_taken', 'round'];
 
-    public function player()
-    {
-        return $this->belongsTo(Player::class);
-    }
+    // public function player()
+    // {
+    //     return $this->belongsTo(Player::class);
+    // }
 
     public function user()
     {

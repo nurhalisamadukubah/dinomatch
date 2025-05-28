@@ -1,906 +1,925 @@
-var rows = 3;
-var columns = 3;
-var currTile;
-var otherTile;
-var round = 1;
-var isWin = false;
-var maxRounds = 3;
-var gameActive = false; // check if the game is active
-var timer;
-var timeRemaining; // 3 minutes in seconds
-var winnerCheckInterval;
-var correctOrder = [
-    "A1.png",
-    "A2.png",
-    "A3.png",
-    "B1.png",
-    "B2.png",
-    "B3.png",
-    "C1.png",
-    "C2.png",
-    "C3.png"
+// Laravel Puzzle Game Implementation
+class PuzzleGame {
+  constructor(config = {}) {
+    // Game configuration
+    this.config = {
+      rows: config.rows || 3,
+      columns: config.columns || 3,
+      timeLimit: config.timeLimit || 60, // seconds
+      maxRounds: config.maxRounds || 3,
+      playerId: config.playerId || null,
+      roomId: config.roomId || null,
+      apiBaseUrl: config.apiBaseUrl || "http://127.0.0.1:8000",
+      csrfToken:
+        config.csrfToken ||
+        document
+          .querySelector('meta[name="csrf-token"]')
+          ?.getAttribute("content"),
+      ...config,
+    };
 
-];
+    // Game state
+    this.gameState = {
+      selectedPiece: null,
+      placedPieces: 0,
+      timeLeft: this.config.timeLimit,
+      gameActive: false,
+      score: 0,
+      round: 1,
+      isWin: false,
+      timer: null,
+      winnerCheckInterval: null,
+    };
 
-initGame();
+    // Puzzle configuration
+    this.puzzlePieces = [
+      {
+        id: "A1",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/A1.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzRFQ0RDNCI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QTE8L3RleHQ+PC9zdmc+",
+      },
+      {
+        id: "A2",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/A2.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI0ZGNkI2QiI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QTI8L3RleHQ+PC9zdmc+",
+      },
+            {
+        id: "A3",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/A3.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI0ZGNkI2QiI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QTI8L3RleHQ+PC9zdmc+",
+      },
+      {
+        id: "B1",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/B1.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzQ1QjdEMSI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QjE8L3RleHQ+PC9zdmc+",
+      },
+      {
+        id: "B2",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/B2.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk2Q0VCNCI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QjI8L3RleHQ+PC9zdmc+",
+      },
+            {
+        id: "B3",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/B3.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk2Q0VCNCI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QjI8L3RleHQ+PC9zdmc+",
+      },
+            {
+        id: "C1",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/C1.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzQ1QjdEMSI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QjE8L3RleHQ+PC9zdmc+",
+      },
+      {
+        id: "C2",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/C2.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk2Q0VCNCI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QjI8L3RleHQ+PC9zdmc+",
+      },
+            {
+        id: "C3",
+        src: this.config.useServerImages
+          ? "/assets/images/3x3/C3.png"
+          : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzk2Q0VCNCI+PC9yZWN0Pjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QjI8L3RleHQ+PC9zdmc+",
+      },
+    ];
 
-// timer
-document.addEventListener("DOMContentLoaded", function () {
-    startTimer(); // Mulai timer secara otomatis
-});
-function startTimer() {
-    clearInterval(timer);
-    clearInterval(winnerCheckInterval); // Clear any existing winner check interval
-    resetBoard(); // Reset the board to initial state
-    gameActive = false; // Set game as inactive selama countdown
+    this.correctOrder = ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"];
+  }
 
-    // Tampilkan countdown sebelum mulai
-    showCountdown(3, () => {
-        timeRemaining = 60; // Reset the time to 60 detik
-        gameActive = true; // Set game as active
-        timer = setInterval(updateTimer, 1000); // Mulai timer permainan
-        winnerCheckInterval = checkOtherPlayerWon(); // Start checking if other players won
+  // Initialize the game
+  init() {
+    this.createBoard();
+    this.createPieces();
+    this.initializeScoreDisplay();
+    this.showStatusMessage("Welcome! Click a puzzle piece to get started.");
+
+    // Auto-start with countdown
+    this.startGameWithCountdown();
+  }
+
+  // Create game board
+  createBoard() {
+    const board = document.getElementById("board");
+    if (!board) {
+      console.error("Board element not found");
+      return;
+    }
+
+    board.innerHTML = "";
+
+    this.correctOrder.forEach((pieceId, index) => {
+      const slot = document.createElement("img");
+      const piece = this.puzzlePieces.find((p) => p.id === pieceId);
+
+      slot.src = piece ? piece.src : "";
+      slot.dataset.position = index;
+      slot.dataset.expectedId = pieceId;
+      slot.classList.add("board-slot", "board");
+      slot.style.filter = "grayscale(100%) opacity(0.5)";
+
+      // Add event listeners for both click and drag & drop
+      slot.addEventListener("click", (e) => this.handleSlotClick(e));
+      this.addDragListeners(slot);
+
+      board.appendChild(slot);
     });
-}
+  }
 
-function showCountdown(seconds, callback) {
-    let countdownElement = document.createElement("div");
+  // Create puzzle pieces
+  createPieces() {
+    const pieces = document.getElementById("pieces");
+    if (!pieces) {
+      console.error("Pieces element not found");
+      return;
+    }
+
+    pieces.innerHTML = "";
+
+    // Shuffle pieces for random order
+    const shuffledPieces = [...this.puzzlePieces].sort(
+      () => Math.random() - 0.5
+    );
+
+    shuffledPieces.forEach((piece) => {
+      const img = document.createElement("img");
+      img.src = piece.src;
+      img.dataset.pieceId = piece.id;
+      img.classList.add("puzzle-piece");
+      img.draggable = true;
+
+      // Add event listeners
+      img.addEventListener("click", (e) => this.handlePieceClick(e));
+      this.addDragListeners(img);
+
+      pieces.appendChild(img);
+    });
+  }
+
+  // Add drag and drop listeners
+  addDragListeners(element) {
+    // Desktop drag events
+    element.addEventListener("dragstart", (e) => this.dragStart(e));
+    element.addEventListener("dragover", (e) => this.dragOver(e));
+    element.addEventListener("dragenter", (e) => this.dragEnter(e));
+    element.addEventListener("dragleave", (e) => this.dragLeave(e));
+    element.addEventListener("drop", (e) => this.dragDrop(e));
+    element.addEventListener("dragend", (e) => this.dragEnd(e));
+
+    // Mobile touch events
+    element.addEventListener("touchstart", (e) => this.touchStart(e), {
+      passive: false,
+    });
+    element.addEventListener("touchmove", (e) => this.touchMove(e), {
+      passive: false,
+    });
+    element.addEventListener("touchend", (e) => this.touchEnd(e));
+  }
+
+  // Handle piece click
+  handlePieceClick(e) {
+    if (!this.gameState.gameActive || e.target.classList.contains("hidden"))
+      return;
+
+    // Clear previous selections
+    document.querySelectorAll(".puzzle-piece").forEach((p) => {
+      p.classList.remove("selected");
+    });
+    document.querySelectorAll(".board-slot").forEach((s) => {
+      s.classList.remove("target-highlight");
+    });
+
+    // Select this piece
+    this.gameState.selectedPiece = e.target;
+    e.target.classList.add("selected");
+
+    // Highlight correct target slot
+    const pieceId = e.target.dataset.pieceId;
+    const targetIndex = this.correctOrder.indexOf(pieceId);
+    const targetSlot = document.querySelector(
+      `.board-slot[data-position="${targetIndex}"]`
+    );
+
+    if (targetSlot && !targetSlot.classList.contains("placed")) {
+      targetSlot.classList.add("target-highlight");
+    }
+
+    this.showStatusMessage(
+      "Now click the highlighted slot to place the piece!"
+    );
+  }
+
+  // Handle slot click
+  handleSlotClick(e) {
+    if (
+      !this.gameState.gameActive ||
+      !this.gameState.selectedPiece ||
+      e.target.classList.contains("placed")
+    )
+      return;
+
+    const pieceId = this.gameState.selectedPiece.dataset.pieceId;
+    const expectedId = e.target.dataset.expectedId;
+
+    if (pieceId === expectedId) {
+      this.placePiece(e.target, this.gameState.selectedPiece);
+    } else {
+      this.showWrongPlacement();
+    }
+  }
+
+  // Drag and drop handlers
+  dragStart(e) {
+    if (!this.gameState.gameActive) return;
+    this.gameState.currentTile = e.target;
+
+    if (e.type === "touchstart") {
+      const touch = e.touches[0];
+      e.target.initialX = touch.clientX - e.target.getBoundingClientRect().left;
+      e.target.initialY = touch.clientY - e.target.getBoundingClientRect().top;
+    }
+  }
+
+  dragOver(e) {
+    if (!this.gameState.gameActive) return;
+    e.preventDefault();
+  }
+
+  dragEnter(e) {
+    if (!this.gameState.gameActive) return;
+    e.preventDefault();
+  }
+
+  dragLeave(e) {
+    if (!this.gameState.gameActive) return;
+  }
+
+  dragDrop(e) {
+    if (!this.gameState.gameActive) return;
+    this.gameState.otherTile = e.target;
+  }
+
+  dragEnd(e) {
+    if (!this.gameState.gameActive) return;
+
+    if (!this.gameState.currentTile || !this.gameState.otherTile) return;
+
+    const pieceId = this.gameState.currentTile.dataset.pieceId;
+    const boardIndex = Array.from(
+      document.getElementById("board").getElementsByTagName("img")
+    ).indexOf(this.gameState.otherTile);
+
+    if (boardIndex !== -1 && pieceId === this.correctOrder[boardIndex]) {
+      this.placePiece(this.gameState.otherTile, this.gameState.currentTile);
+    }
+
+    // Reset
+    this.gameState.currentTile = null;
+    this.gameState.otherTile = null;
+  }
+
+  // Touch handlers for mobile
+  touchStart(e) {
+    this.dragStart(e);
+  }
+
+  touchMove(e) {
+    if (!this.gameState.gameActive) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const offsetX = touch.clientX - e.target.initialX;
+    const offsetY = touch.clientY - e.target.initialY;
+
+    e.target.style.position = "absolute";
+    e.target.style.left = `${offsetX}px`;
+    e.target.style.top = `${offsetY}px`;
+    e.target.style.zIndex = "1000";
+  }
+
+  touchEnd(e) {
+    if (!this.gameState.gameActive) return;
+
+    const rect = e.target.getBoundingClientRect();
+    const targetTile = document.elementFromPoint(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2
+    );
+
+    if (targetTile && targetTile.classList.contains("board-slot")) {
+      this.gameState.otherTile = targetTile;
+      this.dragEnd(e);
+    }
+
+    // Reset position
+    e.target.style.position = "static";
+    e.target.style.zIndex = "auto";
+  }
+
+  // Place piece correctly
+  placePiece(slot, piece) {
+    slot.classList.add("placed");
+    slot.classList.remove("target-highlight");
+    slot.style.filter = "none";
+    slot.style.opacity = "1";
+
+    piece.classList.add("hidden");
+    piece.classList.remove("selected");
+    piece.style.opacity = "0";
+
+    this.gameState.placedPieces++;
+    this.gameState.score += 10;
+    this.updateScore();
+
+    this.showStatusMessage("Correct! Well done!", "success");
+
+    // Clear selection
+    this.gameState.selectedPiece = null;
+
+    // Check if puzzle is complete
+    if (this.gameState.placedPieces === this.puzzlePieces.length) {
+      this.completePuzzle();
+    }
+  }
+
+  // Show wrong placement
+  showWrongPlacement() {
+    this.gameState.selectedPiece.classList.add("shake");
+    this.showStatusMessage("Wrong slot! Try the highlighted one.", "error");
+
+    setTimeout(() => {
+      if (this.gameState.selectedPiece) {
+        this.gameState.selectedPiece.classList.remove("shake");
+      }
+    }, 500);
+  }
+
+  // Complete puzzle
+  async completePuzzle() {
+    this.gameState.gameActive = false;
+    clearInterval(this.gameState.timer);
+    clearInterval(this.gameState.winnerCheckInterval);
+
+    // Calculate bonus points
+    const timeBonus = Math.floor(this.gameState.timeLeft / 10) * 5;
+    this.gameState.score += timeBonus;
+    this.updateScore();
+
+    this.showStatusMessage(
+      `Congratulations! Puzzle completed! Time bonus: +${timeBonus} points`,
+      "success"
+    );
+    this.generateConfetti();
+
+    // Save game data and check for winner
+    if (this.config.playerId && this.config.roomId) {
+      try {
+        const correctPieces = this.countCorrectPieces();
+        const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
+
+        await this.saveGameData(correctPieces, timeTaken);
+        await this.handleWinnerLogic();
+      } catch (error) {
+        console.error("Error handling game completion:", error);
+      }
+    } else {
+      // Single player mode
+      setTimeout(() => {
+        if (confirm("Congratulations! Would you like to play again?")) {
+          this.startNewGame();
+        }
+      }, 3000);
+    }
+  }
+
+  // Handle winner logic for multiplayer
+  async handleWinnerLogic() {
+    try {
+      // Update user level
+      const updateResponse = await fetch(
+        `${this.config.apiBaseUrl}/updateLevel/${this.config.playerId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": this.config.csrfToken,
+          },
+        }
+      );
+
+      const updateData = await updateResponse.json();
+      console.log("Level update response:", updateData);
+
+      // Update score display
+      if (updateData.success) {
+        const scoreDisplay = document.getElementById("score");
+        if (scoreDisplay) {
+          scoreDisplay.innerText = updateData.wins;
+        }
+      }
+
+      // Show winner popup
+      const popup = document.getElementById("popup");
+      if (popup) {
+        popup.style.display = "flex";
+        this.generateConfetti();
+
+        if (this.gameState.round < this.config.maxRounds) {
+          this.startCountdown(10, "winnerCountdown", () => {
+            this.nextRound();
+          });
+        } else {
+          this.startCountdown(5, "winnerCountdown", () => {
+            this.showFinishModal();
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error handling winner logic:", error);
+    }
+  }
+
+  // Start game with countdown
+  startGameWithCountdown() {
+    this.showCountdown(3, () => {
+      this.gameState.timeLeft = this.config.timeLimit;
+      this.gameState.gameActive = true;
+      this.startTimer();
+
+      if (this.config.roomId) {
+        this.gameState.winnerCheckInterval = this.checkOtherPlayerWon();
+      }
+    });
+  }
+
+  // Show countdown overlay
+  showCountdown(seconds, callback) {
+    const countdownElement = document.createElement("div");
     countdownElement.id = "countdown-overlay";
-    countdownElement.style.position = "fixed";
-    countdownElement.style.top = "50%";
-    countdownElement.style.left = "50%";
-    countdownElement.style.transform = "translate(-50%, -50%)";
-    countdownElement.style.fontSize = "48px";
-    countdownElement.style.color = "white";
-    countdownElement.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-    countdownElement.style.padding = "20px";
-    countdownElement.style.borderRadius = "10px";
-    countdownElement.style.zIndex = "1000";
+    countdownElement.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        `;
     document.body.appendChild(countdownElement);
 
-    let countdownInterval = setInterval(() => {
-        countdownElement.textContent = seconds;
-        seconds--;
+    const countdownInterval = setInterval(() => {
+      countdownElement.textContent = seconds;
+      seconds--;
 
-        if (seconds < 0) {
-            clearInterval(countdownInterval);
-            document.body.removeChild(countdownElement); // Hapus countdown
-            callback(); // Panggil callback setelah countdown selesai
-        }
+      if (seconds < 0) {
+        clearInterval(countdownInterval);
+        document.body.removeChild(countdownElement);
+        callback();
+      }
     }, 1000);
-}
+  }
 
-// Perbaikan untuk updateTimer function
-function updateTimer() {
-    var minutes = Math.floor(timeRemaining / 60);
-    var seconds = timeRemaining % 60;
+  // Timer functions
+  startTimer() {
+    clearInterval(this.gameState.timer);
+    this.gameState.timer = setInterval(() => this.updateTimer(), 1000);
+  }
 
-    if (seconds < 10) {
-        seconds = "0" + seconds;
+  updateTimer() {
+    const timerElement =
+      document.getElementById("timer") || document.getElementById("time");
+    if (!timerElement) return;
+
+    const minutes = Math.floor(this.gameState.timeLeft / 60);
+    const seconds = this.gameState.timeLeft % 60;
+    timerElement.textContent = `${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+    if (this.gameState.timeLeft > 0) {
+      this.gameState.timeLeft--;
+    } else {
+      this.gameTimeUp();
     }
+  }
 
-    document.getElementById("time").textContent = `${minutes}:${seconds}`;
+  // Handle time up
+  async gameTimeUp() {
+    this.gameState.gameActive = false;
+    clearInterval(this.gameState.timer);
+    clearInterval(this.gameState.winnerCheckInterval);
 
-    if (timeRemaining == 0) {
-        clearInterval(timer);
-        clearInterval(winnerCheckInterval); // Stop checking for winners
-        gameActive = false;
-        
-        const correctPieces = countCorrectPieces();
-        const timeTaken = 60 - timeRemaining;
+    this.showStatusMessage("Time's up! Game over!", "error");
 
-        // Save game data but don't check for a winner - both players have lost due to timeout
-        sendGameData(playerId, correctPieces, timeTaken, round, roomId)
-            .then(async () => {
-                // Display loss popup directly without checking for a winner
-                document.getElementById("losePopup").style.display = "flex";
-                // document.getElementById("loserDisplay").innerText = "Waktu habis! Tidak ada pemenang.";
-                generateSmokeAndBlood();
+    if (this.config.playerId && this.config.roomId) {
+      try {
+        const correctPieces = this.countCorrectPieces();
+        const timeTaken = this.config.timeLimit;
 
-                if (round >= maxRounds) {
-                    // For round 3, show loser popup with countdown, then show finishModal
-                    const finishCountdown = document.getElementById("loserCountdown");
-                    let seconds = 5; // Show lose popup for 5 seconds before showing finishModal
-                    
-                    finishCountdown.textContent = seconds;
-                    
-                    const countdownInterval = setInterval(() => {
-                        seconds--;
-                        finishCountdown.textContent = seconds;
-                        
-                        if (seconds <= 0) {
-                            clearInterval(countdownInterval);
-                            closeModal(); // Close the lose popup
-                            finishModal(roomId, round, playerId); // Show the finish modal
-                        }
-                    }, 1000);
-                } else {
-                    // For rounds 1 and 2, just show the loser popup with countdown
-                    round++;
-                    document.getElementById("round").innerText = round;
-                    startCountdown(10, "loserCountdown");
-                }
-            })
-            .catch((error) => {
-                console.error("Error saving game data:", error);
+        await this.saveGameData(correctPieces, timeTaken);
+
+        // Show lose popup
+        const losePopup = document.getElementById("losePopup");
+        if (losePopup) {
+          losePopup.style.display = "flex";
+          this.generateSmokeAndBlood();
+
+          if (this.gameState.round >= this.config.maxRounds) {
+            this.startCountdown(5, "loserCountdown", () => {
+              this.showFinishModal();
             });
-
-        return;
+          } else {
+            this.startCountdown(10, "loserCountdown", () => {
+              this.nextRound();
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error handling time up:", error);
+      }
+    } else {
+      // Single player mode
+      setTimeout(() => {
+        if (confirm("Time's up! Would you like to try again?")) {
+          this.startNewGame();
+        }
+      }, 2000);
     }
+  }
 
-    timeRemaining--;
-}
-
-// Fungsi helper untuk menghitung potongan yang benar
-function countCorrectPieces() {
+  // Utility functions
+  countCorrectPieces() {
     const board = document.getElementById("board").getElementsByTagName("img");
     let correctCount = 0;
 
     for (let i = 0; i < board.length; i++) {
-        const currentImg = board[i].src.split("/").pop(); // Ambil nama file saja
-        if (currentImg === correctOrder[i]) {
-            correctCount++;
-        }
+      const currentImg = board[i].src.split("/").pop().split(".")[0]; // Get filename without extension
+      const expectedId = this.correctOrder[i];
+
+      if (board[i].style.filter.includes("none") && currentImg === expectedId) {
+        correctCount++;
+      }
     }
 
     return correctCount;
-}
+  }
 
-function dragStart(e) {
-    if (!gameActive) return;
-    currTile = this;
+  // Show status message
+  showStatusMessage(message, type = "info") {
+    const statusEl = document.getElementById("statusMessage");
+    if (!statusEl) return;
 
-    if (e.type === "touchstart") {
-        const touch = e.touches[0];
-        this.initialX = touch.clientX - this.getBoundingClientRect().left;
-        this.initialY = touch.clientY - this.getBoundingClientRect().top;
+    statusEl.textContent = message;
+    statusEl.className = `status-message show ${type}`;
+
+    setTimeout(() => {
+      statusEl.classList.remove("show");
+    }, 3000);
+  }
+
+  // Update score display
+  updateScore() {
+    const scoreEl = document.getElementById("score");
+    if (scoreEl) {
+      scoreEl.textContent = this.gameState.score;
     }
-}
+  }
 
-function dragOver(e) {
-    if (!gameActive) return;
-    e.preventDefault();
-}
-
-function dragEnter(e) {
-    if (!gameActive) return;
-    e.preventDefault();
-}
-
-function dragLeave() {
-    if (!gameActive) return;
-}
-
-function dragDrop() {
-    if (!gameActive) return;
-    otherTile = this;
-}
-
-function dragEnd() {
-    if (!gameActive) return;
-
-    if (!currTile || !otherTile) {
-        console.log("Tile tidak terdefinisi");
-        return;
-    }
-
-    if (currTile.src && currTile.style.filter.includes('none')) {
-        return;
-    }
-
-    let currImg = currTile.src;
-    let otherImg = otherTile.src;
-    
-    // Cek apakah piece diletakkan di posisi yang benar
-    const boardIndex = Array.from(document.getElementById("board").getElementsByTagName("img")).indexOf(otherTile);
-    const currentPieceImg = currImg.split("/").pop();
-    
-    if (boardIndex !== -1 && currentPieceImg === correctOrder[boardIndex]) {
-        // Jika posisi benar
-        otherTile.src = currImg;
-        otherTile.style.filter = 'none';
-        otherTile.style.opacity = '1';
-        
-        if (currTile.parentElement.id === 'pieces') {
-            currTile.style.opacity = '0%';
-        }
-    } else {
-        // Jika posisi salah, kembalikan piece
-        if (currTile.parentElement.id === 'pieces') {
-            // Kembalikan ke posisi awal
-            otherTile.src = otherImg;
-            currTile.style.display = 'block';
-        }
-    }
-
-    // Reset tile
-    currTile = null;
-    otherTile = null;
-
-    checkBoard();
-}
-
-// Fungsi untuk meng-handle touch move (mobile)
-function touchMove(e) {
-    if (!gameActive) return;
-    e.preventDefault();
-
-    const touch = e.touches[0];
-    const offsetX = touch.clientX - this.initialX;
-    const offsetY = touch.clientY - this.initialY;
-
-    // Pindahkan tile sesuai dengan posisi touch
-    this.style.position = "absolute";
-    this.style.left = `${offsetX}px`;
-    this.style.top = `${offsetY}px`;
-}
-
-// Fungsi untuk meng-handle touch end (mobile)
-function touchEnd() {
-    if (!gameActive) return;
-
-    // Cari tile target berdasarkan posisi akhir touch
-    const rect = this.getBoundingClientRect();
-    const targetTile = document.elementFromPoint(
-        rect.left + rect.width / 2,
-        rect.top + rect.height / 2
-    );
-
-    if (targetTile && targetTile.classList.contains("board")) {
-        otherTile = targetTile; // Simpan tile target
-        dragEnd(); // Panggil fungsi dragEnd untuk menukar gambar
-    }
-
-    // Reset posisi tile
-    this.style.position = "static";
-}
-
-function initGame() {
-    createBoard();
-    createPieces();
-}
-
-function createBoard() {
-    const board = document.getElementById("board");
-    board.innerHTML = ""; // Bersihkan board sebelum menambahkan gambar
-
-    // Daftar gambar yang akan ditampilkan
-    const images = [
-        "/assets/images/3x3/A1.png", "/assets/images/3x3/A2.png", "/assets/images/3x3/A3.png",
-        "/assets/images/3x3/B1.png", "/assets/images/3x3/B2.png", "/assets/images/3x3/B3.png",
-        "/assets/images/3x3/C1.png", "/assets/images/3x3/C2.png", "/assets/images/3x3/C3.png"
-    ];
-
-    images.forEach((imgSrc) => {
-        let tile = document.createElement("img");
-        tile.src = imgSrc;
-        tile.alt = imgSrc.split(".")[0]; // Nama gambar tanpa ekstensi
-        
-        setListener(tile);
-
-        board.appendChild(tile);
-    });
-}
-
-function createPieces() {
-    const pieces = document.getElementById("pieces");
-    pieces.innerHTML = ""; // Bersihkan pieces
-    var key = [];
-    for (i = 0; i < 16; i++) key[i] = i + 1;
-    for (i = 16; i < 32; i++) key[i] = i - 16 + 1;
-    var nonce = [];
-    for (i = 0; i < 8; i++) nonce[i] = i + 1 + 100;
-    var counter = [];
-    for (i = 0; i < 8; i++) counter[i] = i + 1 + 100 + 8;
-
-    var sigma = [0x61707865, 0x3120646e, 0x79622d36, 0x6b206574];
-
-    var salsa20 = new Salsa20(key, nonce, counter, sigma);
-    var hexOutputArray = salsa20.getHexStringArray(64);
-    var imgArr = [
-        "/assets/images/3x3/A1.png",
-        "/assets/images/3x3/A2.png",
-        "/assets/images/3x3/A3.png",
-        "/assets/images/3x3/B1.png",
-        "/assets/images/3x3/B2.png",
-        "/assets/images/3x3/B3.png",
-        "/assets/images/3x3/C1.png",
-        "/assets/images/3x3/C2.png",
-        "/assets/images/3x3/C3.png",
-    ];
-
-    let pieceCounter = 0;
-
-    for (i = 0; i < hexOutputArray.length; i++) {
-        let imgInd = parseInt(hexOutputArray[i], 9) % 9;
-        if (imgArr[imgInd] !== false) {
-            // Buat elemen img langsung
-            let imgElement = document.createElement("img");
-            imgElement.src = imgArr[imgInd];
-            setListener(imgElement);
-
-            // Tambahkan langsung ke container
-            pieces.appendChild(imgElement);
-
-            imgArr[imgInd] = false;
-            pieceCounter++;
-        }
-        if (i == 8) break;
-    }
-
-    imgArr.forEach((img) => {
-        if (img) {
-            // Buat elemen img langsung
-            let imgElement = document.createElement("img");
-            imgElement.src = img;
-            setListener(imgElement);
-
-            // Tambahkan langsung ke container
-            pieces.appendChild(imgElement);
-
-            pieceCounter++;
-        }
-    });
-}
-
-function setListener(elem) {
-    elem.addEventListener("dragstart", dragStart); // click on image to drag
-    elem.addEventListener("dragover", dragOver); // drag an image
-    elem.addEventListener("dragenter", dragEnter); // dragging an image into another one
-    elem.addEventListener("dragleave", dragLeave); // dragging an image away from another one
-    elem.addEventListener("drop", dragDrop); // drop an image onto another one
-    elem.addEventListener("dragend", dragEnd); // after you completed dragDrop
-
-    // Event listener untuk mobile
-    elem.addEventListener("touchstart", dragStart, { passive: false });
-    elem.addEventListener("touchmove", touchMove, { passive: false });
-    elem.addEventListener("touchend", touchEnd);
-}
-
-function resetBoard() {
-    createBoard(); // Clear and reinitialize the board
-    createPieces(); // Clear and reinitialize the pieces
-}
-
-// Modify sendGameData to clear the winner check interval when the game ends
-async function sendGameData(playerId, correctPieces, timeTaken, round, roomId) {
-    try {
-        console.log("Sending game data:", { player_id: playerId, room_id: roomId, correct_pieces: correctPieces, time_taken: timeTaken, round: round });
-        
-        const response = await fetch("http://127.0.0.1:8000/saveGameResult", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
-            },
-            body: JSON.stringify({
-                player_id: playerId,
-                room_id: roomId,
-                correct_pieces: correctPieces,
-                time_taken: timeTaken,
-                round: round,
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Game data saved:", data);
-        return data;
-    } catch (error) {
-        console.error("Error saving game data:", error);
-        throw error;
-    }
-}
-
-async function checkWinner(roomId, round, playerId) {
-    try {
-        // Add timestamp to prevent caching
-        const timestamp = new Date().getTime();
-        const response = await fetch(`http://127.0.0.1:8000/getWinner/${roomId}/${round}?t=${timestamp}`);
-        
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log("Winner check response:", data);
-
-        if (data.message === "Menunggu pemain lain") {
-            console.log("Still waiting for other players...");
-            return null;
-        }
-
-        const scoreDisplay = document.getElementById("score");
-        const initialScore = scoreDisplay ? parseInt(scoreDisplay.innerText || "0") : 0;
-
-        if (data.winner) {
-            console.log("Winner found:", data.winner, "ID:", data.id);
-            
-            // If this player is the winner, update the user level
-            if (data.id == playerId) {
-                console.log("Current player is the winner");
-                
-                // Call API to update user level
-                try {
-                    const updateResponse = await fetch(`http://127.0.0.1:8000/updateLevel/${playerId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    });
-                    
-                    const updateData = await updateResponse.json();
-                    console.log("Level update response:", updateData);
-                    
-                    // Update score display with data from server
-                    if (scoreDisplay && updateData.success) {
-                        scoreDisplay.innerText = updateData.wins;
-                    }
-                    
-                    return { 
-                        isWinner: true, 
-                        totalWin: updateData.success ? updateData.wins : initialScore + 1,
-                        level: updateData.success ? updateData.level : null
-                    };
-                } catch (updateError) {
-                    console.error("Error updating level:", updateError);
-                    // Fallback to client-side score increment if API fails
-                    if (scoreDisplay) {
-                        scoreDisplay.innerText = initialScore + 1;
-                    }
-                    return { isWinner: true, totalWin: initialScore + 1 };
-                }
-            } else {
-                console.log("Current player is not the winner");
-                if (scoreDisplay) {
-                    scoreDisplay.innerText = initialScore;
-                }
-                return { isWinner: false, totalWin: initialScore };
-            }
-        }
-
-        return { isWinner: false, totalWin: initialScore };
-    } catch (error) {
-        console.error("Error checking winner:", error);
-        throw error;
-    }
-}
-
-async function showNextRoundPopup(roomId, round, playerId) {
-    try {
-        const correctPieces = countCorrectPieces();
-        const timeTaken = 25 - timeRemaining;
-
-        await sendGameData(playerId, correctPieces, timeTaken, round, roomId);
-
-        let winnerResult = null;
-        let attempts = 0;
-        const maxAttempts = 5;
-
-        while (attempts < maxAttempts) {
-            winnerResult = await checkWinner(roomId, round, playerId);
-            if (winnerResult !== null) break;
-
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            attempts++;
-        }
-
-        if (!winnerResult) {
-            console.error("Timeout checking winner");
-            return;
-        }
-
-        if (winnerResult.isWinner) {
-            document.getElementById("popup").style.display = "flex";
-            generateConfetti();
-            startCountdown(10, "winnerCountdown");
-        } else {
-            document.getElementById("losePopup").style.display = "flex";
-            generateSmokeAndBlood();
-            startCountdown(10, "loserCountdown");
-        }
-
-        const roundDisplay = document.getElementById("round");
-        if (roundDisplay) {
-            roundDisplay.innerText = round;
-        }
-    } catch (error) {
-        console.error("Error in showNextRoundPopup:", error);
-    }
-}
-
-// Add function to initialize score display
-function initializeScoreDisplay() {
+  // Initialize score display
+  initializeScoreDisplay() {
     const scoreDisplay = document.getElementById("score");
     if (scoreDisplay && !scoreDisplay.innerText) {
-        scoreDisplay.innerText = "0";
+      scoreDisplay.innerText = "0";
     }
-}
+  }
 
-// Call this when game starts
-document.addEventListener("DOMContentLoaded", function () {
-    initializeScoreDisplay();
-});
-
-// Modified checkBoard function to use async/await
-async function checkBoard() {
-    const board = document.getElementById("board").getElementsByTagName('img');
-    let correctCount = 0;
-    let totalPieces = correctOrder.length;
-    let allPiecesPlaced = true;
-
-    for (let i = 0; i < board.length; i++) {
-        const currentImg = board[i].src.split("/").pop();
-        const correctImg = correctOrder[i];
-        
-        if (!board[i].style.filter.includes('none')) {
-            allPiecesPlaced = false;
-            break;
-        }
-        
-        if (currentImg === correctImg) {
-            correctCount++;
-        }
-    }
-
-    if (correctCount === totalPieces && allPiecesPlaced) {
-        clearInterval(timer);
-        clearInterval(winnerCheckInterval); // Stop checking for winners
-        gameActive = false;
-        const timeTaken = 60 - timeRemaining;
-
-        try {
-            // First, save game result
-            await sendGameData(playerId, correctCount, timeTaken, round, roomId);
-            
-            // Then explicitly update the user level through the API
-            const updateResponse = await fetch(`http://127.0.0.1:8000/updateLevel/${playerId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            });
-            
-            const updateData = await updateResponse.json();
-            console.log("Level update response:", updateData);
-            
-            // Update score display with data from server
-            const scoreDisplay = document.getElementById("score");
-            if (scoreDisplay && updateData.success) {
-                const scoreDisplay = document.getElementById("score");
-                if (scoreDisplay) {
-                    const currentScore = parseInt(scoreDisplay.innerText || "0");
-                    scoreDisplay.innerText = currentScore + 1;
-                }
-                console.log(`Score updated to ${updateData.wins}, level is now ${updateData.level}`);
-            }
-
-            const popup = document.getElementById("popup");
-            if (popup) {
-                popup.style.display = "flex";
-                generateConfetti();
-                
-                // Always show the winner popup first with countdown
-                if (round < maxRounds) {
-                    // For rounds 1 and 2, just show the winner popup with countdown
-                    startCountdown(10, "winnerCountdown");
-                    round++;
-                    const roundDisplay = document.getElementById("round");
-                    if (roundDisplay) {
-                        roundDisplay.innerText = round;
-                    }
-                } else {
-                    // For round 3, show winner popup with countdown, then show finishModal
-                    const finishCountdown = document.getElementById("winnerCountdown");
-                    let seconds = 5; // Show win popup for 5 seconds before showing finishModal
-                    
-                    finishCountdown.textContent = seconds;
-                    
-                    const countdownInterval = setInterval(() => {
-                        seconds--;
-                        finishCountdown.textContent = seconds;
-                        
-                        if (seconds <= 0) {
-                            clearInterval(countdownInterval);
-                            closeModal(); // Close the win popup
-                            finishModal(roomId, round, playerId); // Show the finish modal
-                        }
-                    }, 1000);
-                }
-            }
-
-            return true;
-        } catch (error) {
-            console.error("Error in checkBoard:", error);
-            return false;
-        }
-    }
-    
-    return false;
-}
-
-async function finishModal(roomId, round, playerId) {
-    let timeoutId;
-    let winnerResult;
-    
-    // Get the current score
-    const scoreDisplay = document.getElementById("score");
-    const currentScore = scoreDisplay ? parseInt(scoreDisplay.innerText || "0") : 0;
-    
-    // Check winner only if we have score points (indicating wins)
-    winnerResult = { 
-        isWinner: currentScore > 1,
-        totalWin: currentScore
-    };
-    
-    // Call the resetWins function after the game is complete
+  // API calls
+  async saveGameData(correctPieces, timeTaken) {
     try {
-        const resetResponse = await fetch(`http://127.0.0.1:8000/resetWins/${playerId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        });
-        
-        const resetData = await resetResponse.json();
-        console.log("Wins reset response:", resetData);
-        
-        // Update the score display with reset value (should be 0)
-        if (scoreDisplay && resetData.success) {
-            scoreDisplay.innerText = resetData.wins;
-        }
+      const response = await fetch(`${this.config.apiBaseUrl}/saveGameResult`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": this.config.csrfToken,
+        },
+        body: JSON.stringify({
+          player_id: this.config.playerId,
+          room_id: this.config.roomId,
+          correct_pieces: correctPieces,
+          time_taken: timeTaken,
+          round: this.gameState.round,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Game data saved:", data);
+      return data;
     } catch (error) {
-        console.error("Error resetting wins:", error);
+      console.error("Error saving game data:", error);
+      throw error;
     }
-    
+  }
+
+  // Check if other player won
+  checkOtherPlayerWon() {
+    return setInterval(async () => {
+      if (!this.gameState.gameActive) return;
+
+      try {
+        const response = await fetch(
+          `${this.config.apiBaseUrl}/getWinner/${this.config.roomId}/${this.gameState.round}`
+        );
+
+        if (!response.ok) throw new Error(`Server returned ${response.status}`);
+
+        const data = await response.json();
+
+        if (data.pemenang == 1 && data.id != this.config.playerId) {
+          console.log("Another player won:", data.winner);
+
+          // Stop game
+          clearInterval(this.gameState.timer);
+          clearInterval(this.gameState.winnerCheckInterval);
+          this.gameState.gameActive = false;
+
+          // Save current progress
+          const correctPieces = this.countCorrectPieces();
+          const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
+
+          await this.saveGameData(correctPieces, timeTaken);
+
+          // Show lose popup
+          const losePopup = document.getElementById("losePopup");
+          if (losePopup) {
+            losePopup.style.display = "flex";
+            this.generateSmokeAndBlood();
+
+            if (this.gameState.round >= this.config.maxRounds) {
+              this.startCountdown(5, "loserCountdown", () => {
+                this.showFinishModal();
+              });
+            } else {
+              this.startCountdown(10, "loserCountdown", () => {
+                this.nextRound();
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking if another player won:", error);
+      }
+    }, 2000);
+  }
+
+  // Start countdown with callback
+  startCountdown(seconds, countdownId, callback) {
+    const countdownElement = document.getElementById(countdownId);
+    if (!countdownElement) {
+      console.error(`Element with ID '${countdownId}' not found!`);
+      return;
+    }
+
+    countdownElement.textContent = seconds;
+
+    const countdownInterval = setInterval(() => {
+      seconds--;
+      countdownElement.textContent = seconds;
+
+      if (seconds <= 0) {
+        clearInterval(countdownInterval);
+        this.closeModal();
+        if (callback) callback();
+      }
+    }, 1000);
+  }
+
+  // Close modal
+  closeModal() {
+    const popup = document.getElementById("popup");
+    const losePopup = document.getElementById("losePopup");
+
+    if (popup) popup.style.display = "none";
+    if (losePopup) losePopup.style.display = "none";
+  }
+
+  // Next round
+  nextRound() {
+    this.gameState.round++;
+    const roundDisplay = document.getElementById("round");
+    if (roundDisplay) {
+      roundDisplay.innerText = this.gameState.round;
+    }
+
+    this.resetGame();
+    this.startGameWithCountdown();
+  }
+
+  // Show finish modal
+  async showFinishModal() {
+    // Reset wins after game completion
+    try {
+      const resetResponse = await fetch(
+        `${this.config.apiBaseUrl}/resetWins/${this.config.playerId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": this.config.csrfToken,
+          },
+        }
+      );
+
+      const resetData = await resetResponse.json();
+      console.log("Wins reset response:", resetData);
+
+      const scoreDisplay = document.getElementById("score");
+      if (scoreDisplay && resetData.success) {
+        scoreDisplay.innerText = resetData.wins;
+      }
+    } catch (error) {
+      console.error("Error resetting wins:", error);
+    }
+
     const modal = document.getElementById("myModal");
     const btn = document.getElementById("btn-finish");
-    
-    // Always show modal at the end
-    modal.style.display = "flex";
-    
-    if (winnerResult.isWinner) {
-        document.getElementById("description").innerText = "Silahkan Klaim Hadiah Anda";
+
+    if (modal) {
+      modal.style.display = "flex";
+
+      const currentScore = parseInt(
+        document.getElementById("score")?.innerText || "0"
+      );
+      const isWinner = currentScore > 1;
+
+      if (isWinner) {
+        document.getElementById("description").innerText =
+          "Silahkan Klaim Hadiah Anda";
         btn.innerText = "Klaim";
-        
+
         const redirectWinner = () => {
-            window.location.replace(`http://127.0.0.1:8000/showGalleries/${playerId}`);
+          window.location.replace(
+            `${this.config.apiBaseUrl}/showGalleries/${this.config.playerId}`
+          );
         };
-        
-        timeoutId = setTimeout(redirectWinner, 10000);
-        btn.onclick = () => {
-            clearTimeout(timeoutId);
-            redirectWinner();
-        };
-    } else {
-        document.getElementById("description").innerText = "Kembali Ke Halaman Utama";
+
+        setTimeout(redirectWinner, 10000);
+        btn.onclick = redirectWinner;
+      } else {
+        document.getElementById("description").innerText =
+          "Kembali Ke Halaman Utama";
         btn.innerText = "Kembali";
-        
+
         const redirectLoser = () => {
-            window.location.replace("http://127.0.0.1:8000/room");
+          window.location.replace(`${this.config.apiBaseUrl}/room`);
         };
-        
-        timeoutId = setTimeout(redirectLoser, 10000);
-        btn.onclick = () => {
-            clearTimeout(timeoutId);
-            redirectLoser();
-        };
+
+        setTimeout(redirectLoser, 10000);
+        btn.onclick = redirectLoser;
+      }
     }
-    
-    let countdown = 5;
-    const countdownElement = document.createElement("div");
-    countdownElement.style.marginTop = "10px";
-    modal.querySelector("#description").appendChild(countdownElement);
-    
-    const countdownInterval = setInterval(() => {
-        countdown--;
-        countdownElement.textContent = `Redirect otomatis dalam ${countdown} detik...`;
-        if(countdown <= 0) clearInterval(countdownInterval);
-    }, 1000);
-}
+  }
 
-function startCountdown(seconds, countdownId) {
-    let countdownElement = document.getElementById(countdownId);
-    if (!countdownElement) {
-        console.error(`Element dengan ID '${countdownId}' tidak ditemukan!`);
-        return;
-    }
-
-    countdownElement.textContent = seconds; // Setel teks countdown
-
-    let countdownInterval = setInterval(() => {
-        seconds--; // Kurangi waktu countdown
-        countdownElement.textContent = seconds; // Perbarui teks countdown
-
-        if (seconds <= 0) {
-            clearInterval(countdownInterval); // Hentikan countdown
-            closeModal(); // Tutup pop-up
-            startTimer(); // Mulai ronde berikutnya
-        }
-    }, 1000); // Perbarui setiap 1 detik
-}
-
-function closeModal() {
-    document.getElementById("popup").style.display = "none"; // Sembunyikan pop-up
-    document.getElementById("losePopup").style.display = "none"; // Sembunyikan pop-up
-}
-
-// Tutup modal jika klik di luar area modal atau tombol close
-window.onclick = function (event) {
-    let modal = document.getElementById("myModal");
-    if (event.target == modal || event.target.classList.contains("close")) {
-        closeModal();
-    }
-};
-
-function checkAllPlayersFinished(roomId, round) {
-    return fetch(
-        `http://127.0.0.1:8000/checkAllPlayersFinished/${roomId}/${round}`
-    )
-        .then((response) => response.json())
-        .then((data) => {
-            return data.all_finished; // Mengembalikan true atau false
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-            return false;
-        });
-}
-
-function generateConfetti() {
-    const confettiContainer = document.getElementById("confetti-container");
-    confettiContainer.innerHTML = ""; // Bersihkan confetti sebelumnya
-
-    const colors = [
-        "#FF6B6B",
-        "#4ECDC4",
-        "#45B7D1",
-        "#96CEB4",
-        "#FFEEAD",
-        "#FF9999",
-        "#F7CAC9",
-        "#92A8D1",
-        "#88B04B",
-        "#FFD700",
-    ];
-    for (let i = 0; i < 20; i++) {
-        const confetti = document.createElement("div");
-        confetti.className = "confetti";
-        confetti.style.left = `${Math.random() * 100}%`;
-        confetti.style.animationDelay = `${Math.random()}s`;
-        confetti.style.backgroundColor =
-            colors[Math.floor(Math.random() * colors.length)];
-        confettiContainer.appendChild(confetti);
-    }
-}
-
-// Fungsi untuk efek asap dan darah
-function generateSmokeAndBlood() {
-    const smokeContainer = document.getElementById("smoke-container");
-    const bloodContainer = document.getElementById("blood-container");
-    smokeContainer.innerHTML = "";
-    bloodContainer.innerHTML = "";
-
-    // Generate asap
-    for (let i = 0; i < 15; i++) {
-        const smoke = document.createElement("div");
-        smoke.className = "smoke-particle";
-        smoke.style.left = `${Math.random() * 100}%`;
-        smoke.style.setProperty("--random", Math.random());
-        smoke.style.animationDelay = `${Math.random() * 2}s`;
-        smokeContainer.appendChild(smoke);
-    }
-
-    // Generate darah
-    for (let i = 0; i < 10; i++) {
-        const blood = document.createElement("div");
-        blood.className = "blood-drop";
-        blood.style.left = `${Math.random() * 100}%`;
-        blood.style.animationDelay = `${Math.random()}s`;
-        bloodContainer.appendChild(blood);
-    }
-}
-
-// Tutup popup kalah
-document
-    .getElementById("losePopup")
-    .addEventListener("click", function (event) {
-        if (event.target === this || event.target.id === "closeLosePopup") {
-            this.style.display = "none";
-        }
+  // Reset game
+  resetGame() {
+    // Clear selections and highlights
+    document.querySelectorAll(".puzzle-piece").forEach((piece) => {
+      piece.classList.remove("hidden", "selected", "shake");
+      piece.style.opacity = "1";
     });
 
-// Tutup popup kalah
-document.getElementById("popup").addEventListener("click", function (event) {
-    if (event.target === this || event.target.id === "closePopup") {
-        this.style.display = "none";
-    }
-});
+    document.querySelectorAll(".board-slot").forEach((slot) => {
+      slot.classList.remove("placed", "target-highlight");
+      slot.style.filter = "grayscale(100%) opacity(0.5)";
+    });
 
-function checkOtherPlayerWon() {
-    // Check every 2 seconds if any player has already won this round
-    return setInterval(async () => {
-        if (!gameActive) return; // Don't check if game isn't active
-        
-        try {
-            const response = await fetch(`http://127.0.0.1:8000/getWinner/${roomId}/${round}`);
-            
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log("Winner check response:", data); // Log the response for debugging
-            
-            // If there's a winner and it's not the current player, show the loss popup
-            if (data.pemenang == 1 && data.id != playerId) {
-                console.log("Another player won:", data.winner);
-                
-                // Stop all timers and game activity
-                clearInterval(timer);
-                clearInterval(winnerCheckInterval);
-                gameActive = false;
-                
-                // Save current player's progress
-                const correctPieces = countCorrectPieces();
-                const timeTaken = 60 - timeRemaining;
-                
-                try {
-                    await sendGameData(playerId, correctPieces, timeTaken, round, roomId);
-                    console.log("Game data saved for losing player");
-                } catch (error) {
-                    console.error("Error saving losing player data:", error);
-                }
-                
-                // Display loser popup
-                const losePopup = document.getElementById("losePopup");
-                if (losePopup) {
-                    losePopup.style.display = "flex";
-                    generateSmokeAndBlood();
-                    
-                    // Update winner display
-                    // const loserDisplay = document.getElementById("loserDisplay");
-                    // if (loserDisplay) {
-                    //     loserDisplay.innerText = `Pemenang: ${data.winner}`;
-                    // }
-                    
-                    if (round >= maxRounds) {
-                        // For round 3, show loser popup with countdown, then show finishModal
-                        const finishCountdown = document.getElementById("loserCountdown");
-                        let seconds = 5;
-                        
-                        finishCountdown.textContent = seconds;
-                        
-                        const countdownInterval = setInterval(() => {
-                            seconds--;
-                            finishCountdown.textContent = seconds;
-                            
-                            if (seconds <= 0) {
-                                clearInterval(countdownInterval);
-                                closeModal();
-                                finishModal(roomId, round, playerId);
-                            }
-                        }, 1000);
-                    } else {
-                        // For rounds 1 and 2, just show the loser popup with countdown
-                        round++;
-                        document.getElementById("round").innerText = round;
-                        startCountdown(10, "loserCountdown");
-                    }
-                } else {
-                    console.error("losePopup element not found!");
-                }
-            } else if (data.message === "Menunggu pemain lain") {
-                console.log("Still waiting for other players...");
-            }
-        } catch (error) {
-            console.error("Error checking if another player won:", error);
-        }
-    }, 2000); // Check every 2 seconds (reduced from 3 seconds for faster detection)
+    // Reset game state
+    this.gameState.selectedPiece = null;
+    this.gameState.placedPieces = 0;
+    this.gameState.gameActive = true;
+
+    // Recreate pieces in random order
+    this.createPieces();
+
+    this.showStatusMessage("Game reset! Select a piece to start playing.");
+  }
+
+  // Start new game
+  startNewGame() {
+    clearInterval(this.gameState.timer);
+    clearInterval(this.gameState.winnerCheckInterval);
+
+    this.gameState.timeLeft = this.config.timeLimit;
+    this.gameState.score = 0;
+    this.gameState.placedPieces = 0;
+    this.gameState.selectedPiece = null;
+    this.gameState.gameActive = true;
+    this.gameState.round = 1;
+
+    this.updateScore();
+    this.resetGame();
+    this.startGameWithCountdown();
+
+    const roundDisplay = document.getElementById("round");
+    if (roundDisplay) {
+      roundDisplay.innerText = this.gameState.round;
+    }
+
+    this.showStatusMessage("New game started! Good luck!");
+  }
+
+  // Generate confetti effect
+  generateConfetti() {
+    const container = document.getElementById("confetti-container");
+    if (!container) return;
+
+    // Create multiple confetti pieces
+    for (let i = 0; i < 150; i++) {
+      const confetti = document.createElement("div");
+      confetti.classList.add("confetti-piece");
+
+      // Randomize position and style
+      confetti.style.left = Math.random() * 100 + "%";
+      confetti.style.backgroundColor = this.getRandomColor();
+      confetti.style.width = confetti.style.height =
+        Math.random() * 8 + 4 + "px";
+      confetti.style.animationDuration = Math.random() * 3 + 2 + "s";
+      confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+      // Add confetti to container
+      container.appendChild(confetti);
+
+      // Remove confetti after animation
+      setTimeout(() => {
+        confetti.remove();
+      }, 5000);
+    }
+  }
+
+  // Helper function for random colors
+  getRandomColor() {
+    const colors = [
+      "#FFD700",
+      "#7FFF00",
+      "#8A2BE2",
+      "#FF6347",
+      "#00FA9A",
+      "#00BFFF",
+      "#FF69B4",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  // Generate smoke and blood effect for losing condition
+  generateSmokeAndBlood() {
+    const container = document.getElementById("smoke-container");
+    if (!container) return;
+
+    // Create smoke particles
+    for (let i = 0; i < 50; i++) {
+      const smoke = document.createElement("div");
+      smoke.classList.add("smoke-particle");
+
+      smoke.style.left = Math.random() * 100 + "%";
+      smoke.style.width = smoke.style.height = Math.random() * 20 + 10 + "px";
+      smoke.style.animationDuration = Math.random() * 3 + 2 + "s";
+
+      container.appendChild(smoke);
+
+      setTimeout(() => {
+        smoke.remove();
+      }, 4000);
+    }
+  }
 }
+
+// Initialize game when DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  // Check if we're in a game room
+  const roomId = document.getElementById("room-id")?.value;
+  const playerId = document.getElementById("player-id")?.value;
+
+  // Configure game instance
+  const game = new PuzzleGame({
+    rows: 2,
+    columns: 2,
+    timeLimit: 60,
+    maxRounds: 3,
+    playerId: playerId,
+    roomId: roomId,
+    useServerImages: true,
+  });
+
+  // Start game initialization
+  game.init();
+
+  // Expose game to window for debugging/testing
+  window.game = game;
+});
