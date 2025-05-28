@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
-use App\Models\Player;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,13 +11,9 @@ class GalleryController extends Controller
 {
     public function index($id)
     {
-        $player = Player::find($id);
-        if ($player == null) {
-            $galleries = Gallery::take(0)->get();
-        } else {
-            $level = $player->level;
-            $galleries = Gallery::take($level)->get();
-        }
+        $player = User::find($id);
+        $level = $player->level;
+        $galleries = Gallery::take($level)->get();
         return view('galleries.index', compact('galleries'));
     }
 
