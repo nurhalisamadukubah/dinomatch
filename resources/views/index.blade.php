@@ -25,19 +25,19 @@
         {{-- Header --}}
         <header>
             <div class="logo">
-                {{-- <img src="/api/placeholder/70/70" alt="DinoMatch Logo"> --}}
-                <h1>DinoMatch</h1>
+                <!-- <img src="/api/placeholder/70/70" alt="DinoMatch Logo"> -->
+                <h1>DINOMATCH</h1>
             </div>
             <nav>
                 <ul>
                     @if (Session::has('user'))
-                        <li><a href="{{ route('profile.index') }}">My Dig Site</a></li>
+                        <li><a href="{{ route('profile.index') }}">Profile</a></li>
                     @else
-                        <li><a href="{{ route('login.profile') }}">My Dig Site</a></li>
+                        <li><a href="{{ route('login.profile') }}">Profile</a></li>
                     @endif
                     <li><a href="{{ route('galleries.index', ['id' => session('player.id') ?? 0]) }}">Dinopedia</a></li>
-                    <li><a href="{{ route('tutorial.index') }}">How To Play</a></li>
-                    <li><a href="{{ route('about.index') }}">About</a></li>
+                    <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
+                    <li><a href="{{ route('about.index') }}">Tentang</a></li>
                 </ul>
             </nav>
         </header>
@@ -46,8 +46,8 @@
         <main>
             {{-- Hero Section --}}
             <div class="hero">
-                <h2>Unearth Dino Puzzles!</h2>
-                <p>Join other young explorers on exciting dinosaur puzzle adventures!</p>
+                <h2>DINOMATCH</h2>
+                <p>Susun dan Selesaikan Tantangan Puzzle Dinosaurus!</p>
             </div>
 
             {{-- Game Buttons --}}
@@ -63,15 +63,15 @@
                 @endif
                 {{-- Join Section --}}
                 <div class="join-section">
-                    <p>Or join a friend's expedition:</p>
+                    <p>atau Bergabung Menggunakan Passcode Teman:</p>
                     @if (Session::has('user'))
                         <form action="{{ route('join.post') }}" method="POST" class="join-form">
                     @else
                         <form action="{{ route('login.join') }}" method="POST" class="join-form">
                     @endif
                         @csrf
-                        <input type="text" name="code" class="passcode-input" placeholder="Enter friend's pass code" required>
-                        <button type="submit" class="join-btn">PLAY</button>
+                        <input type="text" name="code" class="passcode-input" placeholder="Masukkan Passcode" required>
+                        <button type="submit" class="join-btn">GABUNG</button>
                     </form>
                 </div>
             </div>

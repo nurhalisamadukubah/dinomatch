@@ -1,0 +1,375 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #e6d2b5;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Cabin', sans-serif;
+    position: relative;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* Game Card */
+.game-card {
+    background-color: rgba(58, 77, 57, 0.95);
+    border-radius: 20px;
+    border: 4px solid #daa520;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    height: fit-content;
+    max-height: 85vh;
+}
+
+/* Room Header */
+.room-header {
+    text-align: center;
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.room-header h1 {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 36px;
+    color: #daa520;
+    text-shadow: 2px 2px 0 #331a00;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.room-header h2 {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 24px;
+    color: #daa520;
+    text-shadow: 2px 2px 0 #331a00;
+    margin-bottom: 12px;
+    position: relative;
+    display: inline-block;
+    
+}
+
+/* Code Container */
+.code-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: #734f30;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 3px solid #daa520;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    margin: 0 auto;
+    max-width: 250px;
+}
+
+.code {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: #f5f5dc;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.copy-btn {
+    background-color: #3a4d39;
+    border: 2px solid #daa520;
+    border-radius: 8px;
+    padding: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 0 #2c3c2c;
+}
+
+.copy-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: #f5f5dc;
+}
+
+.copy-btn:hover {
+    background-color: #4a6349;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 #2c3c2c;
+}
+
+.copy-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 #2c3c2c;
+}
+
+.copy-btn.copied {
+    background-color: #2d6a2d;
+}
+
+/* Section Styles */
+.section {
+    margin-bottom: 18px;
+}
+
+.section h2 {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 20px;
+    color: #daa520;
+    text-shadow: 2px 2px 0 #331a00;
+    margin-bottom: 12px;
+    text-align: center;
+    position: relative;
+}
+
+/* Players Section */
+.players-section {
+    background-color: rgba(115, 79, 48, 0.8);
+    padding: 18px;
+    border-radius: 15px;
+    border: 3px solid #daa520;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+/* Player Rows Layout */
+.player-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 90px; /* Fixed height to prevent layout shifts */
+}
+
+.player-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.player-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #e6d2b5;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 2px solid #3a4d39;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+}
+
+.player-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+    border-color: #daa520;
+}
+
+.player-card svg {
+    width: 20px;
+    height: 20px;
+    fill: #3a4d39;
+    flex-shrink: 0;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.player-name {
+    font-family: 'Cabin', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #3a4d39;
+}
+
+.host-badge {
+    font-family: 'Cabin', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #daa520;
+    background-color: rgba(218, 165, 32, 0.2);
+    padding: 2px 6px;
+    border-radius: 8px;
+    border: 1px solid #daa520;
+    text-align: center;
+    letter-spacing: 0.5px;
+    width: fit-content;
+}
+
+.host-card {
+    border-color: #daa520;
+    background-color: rgba(245, 245, 220, 0.95);
+}
+
+.host-card svg {
+    fill: #daa520;
+}
+
+/* Waiting slot for second player */
+.waiting-card {
+    border: 2px dashed #8b8b8b;
+    background-color: rgba(230, 210, 181, 0.3);
+    color: #8b8b8b;
+    font-style: italic;
+    justify-content: center;
+}
+
+.waiting-card svg {
+    fill: #8b8b8b;
+}
+
+/* Countdown Section */
+.countdown-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.countdown-card {
+    background-color: #734f30;
+    padding: 15px 25px;
+    border-radius: 15px;
+    border: 3px solid #daa520;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    position: relative;
+    transform: rotate(-0.5deg);
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: rotate(-0.5deg) scale(1); }
+    100% { transform: rotate(0.5deg) scale(1.01); }
+}
+
+.countdown-content h3 {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 16px;
+    color: #f5f5dc;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    margin-bottom: 8px;
+}
+
+.countdown-timer {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 30px;
+    font-weight: 700;
+    color: #daa520;
+    text-shadow: 2px 2px 0 #331a00;
+    background-color: rgba(58, 77, 57, 0.8);
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 3px solid #daa520;
+    display: inline-block;
+    min-width: 80px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .game-card {
+        padding: 15px;
+        max-height: 90vh;
+    }
+    
+    .room-header h1 {
+        font-size: 20px;
+    }
+    
+    .code-container {
+        max-width: 220px;
+        padding: 10px 15px;
+    }
+    
+    .code {
+        font-size: 18px;
+    }
+    
+    .section h2 {
+        font-size: 18px;
+    }
+    
+    .player-card {
+        padding: 10px 15px;
+        max-width: 280px;
+    }
+    
+    .player-name {
+        font-size: 14px;
+    }
+    
+    .host-badge {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+    
+    .countdown-timer {
+        font-size: 26px;
+        padding: 6px 12px;
+    }
+    
+    .countdown-content h3 {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-card {
+        padding: 12px;
+    }
+    
+    .room-header h1 {
+        font-size: 18px;
+    }
+    
+    .code {
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+    
+    .player-card {
+        max-width: 250px;
+        padding: 8px 12px;
+    }
+    
+    .countdown-card {
+        padding: 12px 20px;
+    }
+    
+    .countdown-content h3 {
+        font-size: 12px;
+    }
+    
+    .countdown-timer {
+        font-size: 24px;
+        padding: 6px 10px;
+    }
+}
