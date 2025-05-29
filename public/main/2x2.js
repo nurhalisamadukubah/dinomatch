@@ -120,6 +120,8 @@ class PuzzleGame {
         this.gameState.wins++;
         this.gameState.gameHistory.push("win");
         this.handleRoundResult("win");
+        this.handleWinnerLogic();
+        
     }
 
     // Player loses current round
@@ -698,30 +700,6 @@ class PuzzleGame {
                     scoreDisplay.innerText = updateData.wins;
                 }
             }
-
-            // Show winner popup
-            const popup = document.getElementById("popup");
-            if (popup) {
-                popup.style.display = "flex";
-                if (this.gameState.round < this.config.maxRounds) {
-                    // PERBAIKI: Gunakan method yang benar
-                    this.startCountdownForNextRound(
-                        10,
-                        "winnerCountdown",
-                        () => {
-                            this.nextRound();
-                        }
-                    );
-                } else {
-                    this.startCountdownForNextRound(
-                        5,
-                        "winnerCountdown",
-                        () => {
-                            this.showFinishModal();
-                        }
-                    );
-                }
-            }
         } catch (error) {
             console.error("Error handling winner logic:", error);
         }
@@ -1084,9 +1062,7 @@ class PuzzleGame {
             }
 
             try {
-                const response = await fetch(
-                    `${this.config.apiBaseUrl}/getWinner/${roomId}/${this.gameState.currentRound}`
-                );
+                const response = await fetch(`${this.config.apiBaseUrl}/getWinner/${roomId}/${this.gameState.currentRound}`);
                 if (!response.ok) throw new Error(`Server returned ${response.status}`);
                 
                 const data = await response.json();

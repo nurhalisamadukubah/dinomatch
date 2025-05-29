@@ -51,7 +51,6 @@ class GameController extends Controller
 
         $winner = $sortedResults->first();
 
-        // Update level pengguna
         $this->updateUserLevel($winner->user_id);
 
         return response()->json([
@@ -221,15 +220,32 @@ class GameController extends Controller
             $user = User::find($userId);
             if (!$user) throw new \Exception("User tidak ditemukan");
 
-            $user->update(['wins' => $user->wins + 1]);
+            $newWins = $user->wins + 1;
 
-            if ($user->wins >= 2) {
-                $user->update(['level' => $user->level + 1, 'wins' => 0]);
+            // Update wins
+            $user->update([
+                'wins' => $newWins
+            ]);
+
+            // Cek apakah sudah mencapai target wins untuk naik level
+            if ($newWins >= 2) {
+                $user->update([
+                    'level' => $user->level + 1,
+                    'wins' => 0
+                ]);
             }
 
-            return response()->json(['success' => true, 'level' => $user->level, 'wins' => $user->wins]);
+            return response()->json([
+                'success' => true,
+                'level' => $user->fresh()->level,
+                'wins' => $user->fresh()->wins
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
