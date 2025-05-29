@@ -142,6 +142,10 @@ class PuzzleGame {
 
         console.log(`Round ${round} result: ${result}`, history);
 
+        // FIXED: Ensure game is completely stopped
+        this.gameState.gameActive = false;
+        this.clearAllIntervals();
+
         // Round 1 logic
         if (round === 1) {
             if (result === "win") {
@@ -155,22 +159,18 @@ class PuzzleGame {
             if (history[0] === "win" && result === "lose") {
                 this.showModal("loseRound2Modal", "countdown4");
             } else if (history[0] === "win" && result === "win") {
-                // Player menang 2 round berturut-turut = menang match
-                // Mulai check match winner untuk pemain lain
+                // Player wins 2 rounds in a row = wins match
                 if (roomId && !this.gameState.matchWinnerCheckInterval) {
-                    this.gameState.matchWinnerCheckInterval =
-                        this.checkMatchWinner();
+                    this.gameState.matchWinnerCheckInterval = this.checkMatchWinner();
                 }
                 this.showWinMatch();
                 return;
             } else if (history[0] === "lose" && result === "win") {
                 this.showModal("winRound2Modal", "countdown3");
             } else if (history[0] === "lose" && result === "lose") {
-                // Player kalah 2 round berturut-turut = kalah match
-                // Mulai check match winner untuk memastikan
+                // Player loses 2 rounds in a row = loses match
                 if (roomId && !this.gameState.matchWinnerCheckInterval) {
-                    this.gameState.matchWinnerCheckInterval =
-                        this.checkMatchWinner();
+                    this.gameState.matchWinnerCheckInterval = this.checkMatchWinner();
                 }
                 this.showLoseMatch();
                 return;
@@ -178,13 +178,12 @@ class PuzzleGame {
         }
         // Round 3 logic
         else if (round === 3) {
-            // Round terakhir, tentukan pemenang berdasarkan total kemenangan
+            // Final round, determine winner based on total wins
             const totalWins = this.gameState.wins;
 
-            // Mulai check match winner
+            // Start match winner check
             if (roomId && !this.gameState.matchWinnerCheckInterval) {
-                this.gameState.matchWinnerCheckInterval =
-                    this.checkMatchWinner();
+                this.gameState.matchWinnerCheckInterval = this.checkMatchWinner();
             }
 
             if (totalWins >= 2) {
@@ -195,7 +194,7 @@ class PuzzleGame {
             return;
         }
 
-        // Pindah ke round berikutnya hanya jika tidak di round terakhir
+        // Move to next round only if not at final round
         if (round < this.config.maxRounds) {
             this.gameState.currentRound++;
             this.updateDisplay();
@@ -376,17 +375,23 @@ class PuzzleGame {
             `Proceeding to next round. Current: ${this.gameState.currentRound}, Max: ${this.config.maxRounds}`
         );
 
-        // Cek apakah masih ada round berikutnya
+        // Clear all intervals before proceeding
+        this.clearAllIntervals();
+
+        // Check if there are more rounds
         if (this.gameState.currentRound <= this.config.maxRounds) {
-            // Reset puzzle untuk round berikutnya
+            // Reset puzzle for next round
             this.resetPuzzleForNextRound();
-            // Mulai game dengan countdown
+            // Start game with countdown
             this.startGameWithCountdown();
         }
     }
 
     resetPuzzleForNextRound() {
-        // Clear selections and highlights
+        // Clear all intervals
+        this.clearAllIntervals();
+
+        // Clear visual elements
         document.querySelectorAll(".puzzle-piece").forEach((piece) => {
             piece.classList.remove("hidden", "selected", "shake");
             piece.style.opacity = "1";
@@ -396,17 +401,15 @@ class PuzzleGame {
             slot.style.filter = "grayscale(100%) opacity(0.5)";
         });
 
-        // Reset puzzle state (tidak reset round/wins/losses)
+        // Reset puzzle state (don't reset round/wins/losses)
         this.gameState.selectedPiece = null;
         this.gameState.placedPieces = 0;
-        this.gameState.gameActive = false; // Akan diset true saat countdown selesai
+        this.gameState.gameActive = false; // Will be set true when countdown finishes
         this.gameState.timeLeft = this.config.timeLimit;
 
         // Recreate pieces in random order
         this.createPieces();
-        this.showStatusMessage(
-            `Round ${this.gameState.currentRound} starting...`
-        );
+        this.showStatusMessage(`Round ${this.gameState.currentRound} starting...`);
     }
 
     // Create game board
@@ -638,9 +641,11 @@ class PuzzleGame {
 
     // Complete puzzle
     async completePuzzle() {
+        // FIXED: Immediately set game as inactive to prevent any further actions
         this.gameState.gameActive = false;
-        clearInterval(this.gameState.timer);
-        clearInterval(this.gameState.winnerCheckInterval);
+        
+        // Clear all intervals immediately to stop other checks
+        this.clearAllIntervals();
 
         // Calculate bonus points
         const timeBonus = Math.floor(this.gameState.timeLeft / 10) * 5;
@@ -650,18 +655,23 @@ class PuzzleGame {
         const correctPieces = this.countCorrectPieces();
         const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
 
-        // Kirim data ke server
-        await this.saveGameData(correctPieces, timeTaken);
+        // Save game data first
+        try {
+            await this.saveGameData(correctPieces, timeTaken);
+            console.log("Game data saved for winning player");
+        } catch (error) {
+            console.error("Error saving game data:", error);
+        }
 
         this.showStatusMessage(
             `Congratulations! Puzzle completed! Time bonus: +${timeBonus} points`,
             "success"
         );
 
-        // Delay sedikit sebelum trigger modal agar user bisa melihat pesan sukses
+        // Trigger win with shorter delay
         setTimeout(() => {
             this.playerWin();
-        }, 1500);
+        }, 1000);
     }
 
     // Handle winner logic for multiplayer
@@ -741,13 +751,13 @@ class PuzzleGame {
 
     // Start game with countdown
     startGameWithCountdown() {
+        this.clearAllIntervals(); // Bersihkan interval lama
         this.showCountdown(3, () => {
             this.gameState.timeLeft = this.config.timeLimit;
             this.gameState.gameActive = true;
             this.startTimer();
-            if (roomId) {
-                this.gameState.winnerCheckInterval = this.checkOtherPlayerWon();
-            }
+            console.log(`Starting winner check for round ${this.gameState.currentRound}`);
+            this.gameState.winnerCheckInterval = this.checkOtherPlayerWon(); // Interval baru
         });
     }
 
@@ -803,16 +813,54 @@ class PuzzleGame {
 
     // Handle time up
     async gameTimeUp() {
+        // FIXED: Immediately set game as inactive
         this.gameState.gameActive = false;
-        clearInterval(this.gameState.timer);
-        clearInterval(this.gameState.winnerCheckInterval);
+        
+        // Clear all intervals immediately
+        this.clearAllIntervals();
+
+        // Save current progress
+        const correctPieces = this.countCorrectPieces();
+        const timeTaken = this.config.timeLimit;
+
+        try {
+            await this.saveGameData(correctPieces, timeTaken);
+            console.log("Game data saved for time up");
+        } catch (error) {
+            console.error("Error saving game data for time up:", error);
+        }
 
         this.showStatusMessage("Time's up! Game over!", "error");
 
-        // Delay sedikit sebelum trigger modal
+        // Trigger lose with shorter delay
         setTimeout(() => {
             this.playerLose();
-        }, 1500);
+        }, 1000);
+    }
+
+    clearAllIntervals() {
+        console.log("Clearing all intervals...");
+        
+        if (this.gameState.timer) {
+            clearInterval(this.gameState.timer);
+            this.gameState.timer = null;
+            console.log("Timer cleared");
+        }
+        if (this.gameState.winnerCheckInterval) {
+            clearInterval(this.gameState.winnerCheckInterval);
+            this.gameState.winnerCheckInterval = null;
+            console.log("Winner check interval cleared");
+        }
+        if (this.gameState.matchWinnerCheckInterval) {
+            clearInterval(this.gameState.matchWinnerCheckInterval);
+            this.gameState.matchWinnerCheckInterval = null;
+            console.log("Match winner check interval cleared");
+        }
+        if (this.gameState.countdownInterval) {
+            clearInterval(this.gameState.countdownInterval);
+            this.gameState.countdownInterval = null;
+            console.log("Countdown interval cleared");
+        }
     }
 
     // Utility functions
@@ -877,7 +925,7 @@ class PuzzleGame {
                         room_id: roomId,
                         correct_pieces: correctPieces,
                         time_taken: timeTaken,
-                        round: this.gameState.round,
+                        round: this.gameState.currentRound,
                     }),
                 }
             );
@@ -988,8 +1036,7 @@ class PuzzleGame {
 
                     // Save current progress sebagai kalah
                     const correctPieces = this.countCorrectPieces();
-                    const timeTaken =
-                        this.config.timeLimit - this.gameState.timeLeft;
+                    const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
                     await this.saveGameData(correctPieces, timeTaken);
 
                     // Update game history jika belum ada
@@ -1020,38 +1067,71 @@ class PuzzleGame {
     // Check if other player won
     checkOtherPlayerWon() {
         return setInterval(async () => {
-            if (!this.gameState.gameActive) return;
+            // Skip if game is not active or round is finished
+            if (!this.gameState.gameActive) {
+                console.log("Game not active, skipping winner check");
+                return;
+            }
+
+            // Skip if we've already processed this round
+            if (this.gameState.currentRound > this.config.maxRounds) {
+                console.log("Game finished, clearing winner check interval");
+                if (this.gameState.winnerCheckInterval) {
+                    clearInterval(this.gameState.winnerCheckInterval);
+                    this.gameState.winnerCheckInterval = null;
+                }
+                return;
+            }
+
             try {
                 const response = await fetch(
-                    `${this.config.apiBaseUrl}/getWinner/${roomId}/${this.gameState.round}`
+                    `${this.config.apiBaseUrl}/getWinner/${roomId}/${this.gameState.currentRound}`
                 );
-                if (!response.ok)
-                    throw new Error(`Server returned ${response.status}`);
+                if (!response.ok) throw new Error(`Server returned ${response.status}`);
+                
                 const data = await response.json();
-                if (data.pemenang == 1 && data.id != playerId) {
-                    console.log("Another player won:", data.winner);
-                    // Stop game
-                    clearInterval(this.gameState.timer);
-                    clearInterval(this.gameState.winnerCheckInterval);
+                
+                console.log(`Checking winner for round ${this.gameState.currentRound}:`, data);
+                
+                // FIXED: More specific checking - ensure we only react once per round
+                if (data.pemenang == 1 && data.id != playerId && this.gameState.gameActive) {
+                    console.log(`Player ${data.winner} won round ${this.gameState.currentRound}, current player ${playerId} loses`);
+                    
+                    // FIXED: Immediately stop the game to prevent continued play
                     this.gameState.gameActive = false;
+                    
+                    // Clear all intervals immediately
+                    this.clearAllIntervals();
 
-                    // Save current progress
+                    // Save current progress as loss
                     const correctPieces = this.countCorrectPieces();
-                    const timeTaken =
-                        this.config.timeLimit - this.gameState.timeLeft;
-                    await this.saveGameData(correctPieces, timeTaken);
+                    const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
+                    
+                    try {
+                        await this.saveGameData(correctPieces, timeTaken);
+                        console.log("Game data saved for losing player");
+                    } catch (error) {
+                        console.error("Error saving game data for losing player:", error);
+                    }
 
-                    this.playerLose();
+                    // Show immediate feedback
+                    this.showStatusMessage(`${data.winner} won this round!`, "error");
+                    
+                    // FIXED: Trigger playerLose with a short delay to show the message
+                    setTimeout(() => {
+                        this.playerLose();
+                    }, 1000);
                 }
             } catch (error) {
                 console.error("Error checking if another player won:", error);
+                // Don't stop the interval on error, just continue checking
             }
-        }, 2000);
+        }, 1500); // Check every 1.5 seconds for more responsive detection
     }
 
     // Next round
     nextRound() {
-        this.gameState.round++;
+        // this.gameState.round++;
         const roundDisplay = document.getElementById("round");
         if (roundDisplay) {
             roundDisplay.innerText = this.gameState.round;
