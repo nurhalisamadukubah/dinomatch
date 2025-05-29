@@ -445,19 +445,46 @@ class PuzzleGame {
             return;
         }
         pieces.innerHTML = "";
-        // Shuffle pieces for random order
-        const shuffledPieces = [...this.puzzlePieces].sort(
-            () => Math.random() - 0.5
-        );
+
+        // Konfigurasi Salsa20
+        const key = Array.from({ length: 16 }, (_, i) => i + 1); // 16-byte key
+        const nonce = Array.from({ length: 8 }, (_, i) => i + 1 + 100); // 8-byte nonce
+        const counter = Array.from({ length: 8 }, (_, i) => i + 1 + 100 + 8); // 8-byte counter
+        const sigma = [0x61707865, 0x3120646e, 0x79622d36, 0x6b206574]; // magic constant
+
+        const salsa20 = new Salsa20(key, nonce, counter, sigma);
+        const hexOutputArray = salsa20.getHexStringArray(64); // Generate 64 hex values
+
+        // Daftar semua potongan puzzle
+        const shuffledPieces = [];
+
+        // Salin daftar asli
+        const availablePieces = [...this.puzzlePieces];
+
+        // Gunakan output Salsa20 untuk memilih potongan secara acak
+        while (availablePieces.length > 0) {
+            const hexValue = parseInt(hexOutputArray.shift(), 16); // Ambil hex value
+            const index = hexValue % availablePieces.length; // Dapatkan indeks acak
+            shuffledPieces.push(availablePieces.splice(index, 1)[0]);
+
+            // Reset hexOutputArray jika habis
+            if (hexOutputArray.length === 0) {
+                hexOutputArray.push(...salsa20.getHexStringArray(64)); // Regenerate
+            }
+        }
+
+        // Tambahkan potongan ke DOM
         shuffledPieces.forEach((piece) => {
             const img = document.createElement("img");
             img.src = piece.src;
             img.dataset.pieceId = piece.id;
             img.classList.add("puzzle-piece");
             img.draggable = true;
-            // Add event listeners
+
+            // Event listeners
             img.addEventListener("click", (e) => this.handlePieceClick(e));
             this.addDragListeners(img);
+
             pieces.appendChild(img);
         });
     }
