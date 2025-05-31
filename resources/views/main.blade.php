@@ -59,7 +59,7 @@
     <!-- Modals -->
     <div id="loseMatchModal" class="modal">
         <div class="modal-content lose-match-modal">
-            <span class="close" onclick="gameLogic.closeModal()">&times;</span>
+            <a href="{{ route('room.index') }}" style="text-decoration: none;"><span class="close" onclick="gameLogic.closeModal()">&times;</span></a>
             <h2 class="modal-title">GAME OVER</h2>
             <div class="game-over-icon">😵‍💫</div>
             <p class="lose-text">Jangan Menyerah, Explorator!</p>
@@ -76,7 +76,7 @@
     <!-- Win Match Modal -->
     <div id="winMatchModal" class="modal">
         <div class="modal-content winner-modal">
-            <span class="close" onclick="gameLogic.closeModal()">&times;</span>
+            <a href="{{ route('galleries.index', ['id' => $player_id]) }}" style="text-decoration: none;"><span class="close" onclick="gameLogic.closeModal()">&times;</span></a>
             <h2 class="modal-title">MENANG!</h2>
             <div class="trophy-display">
                 <div class="trophy-icon">🏆</div>

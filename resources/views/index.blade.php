@@ -35,7 +35,7 @@
                     @else
                         <li><a href="{{ route('login.profile') }}">Profile</a></li>
                     @endif
-                    <li><a href="{{ route('galleries.index', ['id' => session('player.id') ?? 0]) }}">Dinopedia</a></li>
+                    <li><a href="{{ route('galleries.index', ['id' => session('user')->id ]) }}">Dinopedia</a></li>
                     <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
                     <li><a href="{{ route('about.index') }}">Tentang</a></li>
                 </ul>

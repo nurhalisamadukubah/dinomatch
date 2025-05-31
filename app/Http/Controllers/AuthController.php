@@ -68,7 +68,7 @@ class AuthController extends Controller
     public function logout()
     {
         Session::flush(); // Hapus semua session
-        return redirect('/login')->with('success', 'Logout berhasil!');
+        return redirect('/room')->with('success', 'Logout berhasil!');
     }
 }
 

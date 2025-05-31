@@ -357,7 +357,7 @@
             position: absolute;
             width: 40px;
             height: 60px;
-            background: url('/api/placeholder/40/60') no-repeat center;
+            background: url('/assets/images/additional/footprint-2.png') no-repeat center;
             background-size: contain;
             opacity: 0.1;
             z-index: 0;
@@ -560,7 +560,7 @@
 <body>
     <div class="container">
         <!-- Background decorations -->
-        <img src="/api/placeholder/200/200" alt="Fossil decoration" class="fossil-decoration fossil-1">
+        <img src="{{ asset('assets/images/additional/footprint.png') }}" alt="Fossil decoration" class="fossil-decoration fossil-1">
         <img src="/api/placeholder/250/200" alt="Fossil decoration" class="fossil-decoration fossil-2">
         <img src="/api/placeholder/150/150" alt="Fossil decoration" class="fossil-decoration fossil-3">
         <img src="/api/placeholder/180/180" alt="Fossil decoration" class="fossil-decoration fossil-4">

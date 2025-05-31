@@ -118,6 +118,7 @@ class PuzzleGame {
         }
 
         this.gameState.wins++;
+        this.gameState.score +=1;
         this.gameState.gameHistory.push("win");
         this.handleRoundResult("win");
         this.handleWinnerLogic();
@@ -351,8 +352,8 @@ class PuzzleGame {
 
     // Update display elements
     updateDisplay() {
-        const currentRoundElement = document.getElementById("currentRound");
-        const winCountElement = document.getElementById("winCount");
+        const currentRoundElement = document.getElementById("round");
+        const winCountElement = document.getElementById("score");
         const lossCountElement = document.getElementById("lossCount");
 
         if (currentRoundElement) {
@@ -646,7 +647,7 @@ class PuzzleGame {
         piece.classList.remove("selected");
         piece.style.opacity = "0";
         this.gameState.placedPieces++;
-        this.gameState.score += 10;
+        // this.gameState.score += 10;
         this.updateScore();
         this.showStatusMessage("Correct! Well done!", "success");
         // Clear selection
@@ -678,7 +679,7 @@ class PuzzleGame {
 
         // Calculate bonus points
         const timeBonus = Math.floor(this.gameState.timeLeft / 10) * 5;
-        this.gameState.score += timeBonus;
+        // this.gameState.score += timeBonus;
         this.updateScore();
 
         const correctPieces = this.countCorrectPieces();
@@ -1137,7 +1138,7 @@ class PuzzleGame {
         // this.gameState.round++;
         const roundDisplay = document.getElementById("round");
         if (roundDisplay) {
-            roundDisplay.innerText = this.gameState.round;
+            roundDisplay.innerText = this.gameState.currentRound;
         }
         this.resetPuzzleForNextRound();
         this.startGameWithCountdown();

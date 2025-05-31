@@ -172,7 +172,7 @@ main {
     justify-content: center;
     align-items: center;
     padding: 40px 20px;
-    background: url("paper.jpg") no-repeat center;
+    background: url('/assets/images/additional/paper.jpg') no-repeat center;
     border-radius: 25px;
     margin: 20px 0 40px;
     border: 5px solid #734f30;

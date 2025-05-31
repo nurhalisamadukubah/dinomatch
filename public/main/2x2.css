@@ -78,18 +78,6 @@ body {
     opacity: 0.7;
 }
 
-/* .round-info::before {
-    background-image: url('/api/placeholder/40/40');
-}
-
-.timer-info::before {
-    background-image: url('/api/placeholder/40/40');
-}
-
-.score-info::before {
-    background-image: url('/api/placeholder/40/40');
-} */
-
 .timer {
     background-color: #734f30;
     padding: 8px 20px;

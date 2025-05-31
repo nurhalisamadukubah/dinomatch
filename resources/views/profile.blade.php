@@ -57,7 +57,7 @@
             position: absolute;
             width: 30px;
             height: 30px;
-            background: url('/api/placeholder/30/30') no-repeat center;
+            background: url('/assets/images/additional/monstera-leaf.png') no-repeat center;
             background-size: contain;
             opacity: 0.1;
             animation: float 8s ease-in-out infinite;
@@ -551,9 +551,9 @@
         <div class="leaf"></div>
     </div>
 
-    <img src="/api/placeholder/180/180" alt="Floating fossil" class="floating-fossil fossil-1">
-    <img src="/api/placeholder/200/160" alt="Floating fossil" class="floating-fossil fossil-2">
-    <img src="/api/placeholder/140/140" alt="Floating fossil" class="floating-fossil fossil-3">
+    <img src="{{ asset('assets/images/additional/skull.png') }}" alt="Floating fossil" class="floating-fossil fossil-1">
+    {{-- <img src="{{ asset('assets/images/additional/footprint.png') }}" alt="Floating fossil" class="floating-fossil fossil-2">
+    <img src="{{ asset('assets/images/additional/footprint-2.png') }}" alt="Floating fossil" class="floating-fossil fossil-3"> --}}
 
     <div class="container">
         <div class="header">
@@ -571,60 +571,79 @@
 
                     <div class="profile-info">
                         <div class="profile-item">
-                            @if (session()->has('player'))
-                                <div class="profile-value">{{ $player->player->username ?? $user->username }}</div>
-                            @else
-                                <div class="profile-value">{{ $player->user->username ?? $user->username }}</div>
-                            @endif
+                            <div class="profile-value">{{ session('user')->username }}</div>
                             <button class="edit-button">✏️</button>
                         </div>
                     </div>
 
                     <div class="stats-section">
                         <div class="stat-card">
-                            <span class="stat-number">12</span>
+                            <span class="stat-number">{{ $totalWins }}</span>
                             <span class="stat-label">Menang</span>
                         </div>
                         <div class="stat-card" style="background: linear-gradient(135deg, #a55638, #8b4530);">
-                            <span class="stat-number">8</span>
+                            <span class="stat-number">{{ $totalLoses }}</span>
                             <span class="stat-label">Kalah</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="history-section">
-                <h2 class="section-title">RIWAYAT PERMAINAN</h2>
-                <div class="history-container">
-                    @if ($resultsPerRound->isEmpty())
-                        <p>Belum ada riwayat permainan untuk ditampilkan.</p>
-                    @else
-                        @foreach ($resultsPerRound as $round => $data)
-                            @php
-                                $winner = $data['winner'];
-                                $losers = $data['losers'];
-                            @endphp
-
-                            <div class="history-card">
-                                <div class="result-badge result-win">VICTORY!</div>
-                                <div class="history-details">
-                                    <div class="match-players">
-                                        @if (session()->has('player'))
-                                            <span class="player-name">{{ $player->player->username ?? '-' }}</span>
-                                        @else
-                                            <span class="player-name">{{ $player->user->username ?? '-' }}</span>
-                                        @endif
-                                        <span class="vs-text">VS</span>
-                                        <span
-                                            class="player-name">{{ $winner->player->username ?? ($winner->user->username ?? '-') }}</span>
-                                    </div>
-                                    <div class="match-score">3 - 0</div>
-                                </div>
-                            </div>
-                        @endforeach
-                    @endif
-                </div>
+<div class="history-section">
+    <h2 class="section-title">RIWAYAT PERMAINAN</h2>
+    <div class="history-container">
+        @if (empty($roomStats) || count($roomStats) === 0)
+            <div style="text-align: center; padding: 40px; color: #734f30; 
+                        font-family: 'Cabin', sans-serif; font-size: 18px;">
+                <p>🦕 Belum ada riwayat permainan untuk ditampilkan.</p>
+                <p style="font-size: 14px; margin-top: 10px; opacity: 0.7;">
+                    Mulai bermain untuk melihat statistik Anda!
+                </p>
             </div>
+        @else
+            @foreach ($roomStats as $roomId => $stats)
+                @php
+                    // Cek apakah user overall menang di room ini
+                    $isWinnerOverall = ($stats['room_winner_id'] === session('user')->id);
+
+                    $userRoundWins     = $stats['user_round_wins'];
+                    $opponentRoundWins = $stats['opponent_round_wins'];
+                    $opponentNames     = $stats['opponent_names'];
+                @endphp
+
+                <div class="history-card">
+                    {{-- Badge hasil keseluruhan room --}}
+                    @if ($isWinnerOverall)
+                        <div class="result-badge result-win">VICTORY!</div>
+                    @else
+                        <div class="result-badge result-lose">DEFEAT</div>
+                    @endif
+
+                    <div class="history-details">
+                        <div class="match-players">
+                            <span class="player-name">{{ session('user')->username }}</span>
+                            <span class="vs-text">VS</span>
+                            <span class="player-name">
+                                {{ implode(', ', $opponentNames) }}
+                            </span>
+                        </div>
+
+                        <div class="match-score">
+                            {{-- Tampilkan skor berdasarkan ronde yang dimenangkan --}}
+                            @if ($isWinnerOverall)
+                                {{-- Jika user menang room: tampilkan $userRoundWins - $opponentRoundWins --}}
+                                {{ $userRoundWins }} - {{ $opponentRoundWins }}
+                            @else
+                                {{-- Jika user kalah room: tetap tampilkan user vs opponent, tapi urutan menyerupai "pemenang (lawannya) vs user" --}}
+                                {{ $userRoundWins }} - {{ $opponentRoundWins }}
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        @endif
+    </div>
+</div>
 
             <script>
                 // Edit button functionality
