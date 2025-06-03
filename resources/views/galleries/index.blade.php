@@ -93,7 +93,6 @@
                 <p>{{ $gallery->name }}</p>
             </div></a>
         @endforeach
-        
         </div>
         <div id="popup" class="popup">
             <span class="close" onclick="hidePopup()">&times;</span>

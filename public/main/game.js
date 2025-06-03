@@ -148,7 +148,6 @@ class PuzzleGame {
         this.createBoard();
         this.createPieces();
         this.initializeScoreDisplay();
-        this.showStatusMessage("Welcome! Click a puzzle piece to get started.");
 
         // Initialize new game logic
         this.initGameLogic();
@@ -418,7 +417,6 @@ class PuzzleGame {
         // Recreate pieces in random order
         this.createPieces();
         this.updateScore();
-        this.showStatusMessage("Game reset! Select a piece to start playing.");
         this.updateDisplay();
     }
 
@@ -430,7 +428,7 @@ class PuzzleGame {
 
         if (currentRoundElement) {
             if (this.gameState.currentRound > this.gameState.maxRounds) {
-                currentRoundElement.textContent = "Finished";
+                currentRoundElement.textContent = this.gameState.currentRound;
             } else {
                 currentRoundElement.textContent = this.gameState.currentRound;
             }
@@ -484,7 +482,6 @@ class PuzzleGame {
 
         // Recreate pieces in random order
         this.createPieces();
-        this.showStatusMessage(`Round ${this.gameState.currentRound} starting...`);
     }
 
     // Create game board
@@ -604,9 +601,6 @@ class PuzzleGame {
         if (targetSlot && !targetSlot.classList.contains("placed")) {
             targetSlot.classList.add("target-highlight");
         }
-        this.showStatusMessage(
-            "Now click the highlighted slot to place the piece!"
-        );
     }
 
     // Handle slot click
@@ -721,8 +715,6 @@ class PuzzleGame {
         this.gameState.placedPieces++;
         // this.gameState.score += 10;
         this.updateScore();
-        this.showStatusMessage("Correct! Well done!", "success");
-        // Clear selection
         this.gameState.selectedPiece = null;
         // Check if puzzle is complete
         if (this.gameState.placedPieces === this.puzzlePieces.length) {
@@ -733,7 +725,6 @@ class PuzzleGame {
     // Show wrong placement
     showWrongPlacement() {
         this.gameState.selectedPiece.classList.add("shake");
-        this.showStatusMessage("Wrong slot! Try the highlighted one.", "error");
         setTimeout(() => {
             if (this.gameState.selectedPiece) {
                 this.gameState.selectedPiece.classList.remove("shake");
@@ -764,11 +755,6 @@ class PuzzleGame {
         } catch (error) {
             console.error("Error saving game data:", error);
         }
-
-        this.showStatusMessage(
-            `Congratulations! Puzzle completed! Time bonus: +${timeBonus} points`,
-            "success"
-        );
 
         // Trigger win with shorter delay
         setTimeout(() => {
@@ -908,8 +894,6 @@ class PuzzleGame {
             console.error("Error saving game data for time up:", error);
         }
 
-        this.showStatusMessage("Time's up! Game over!", "error");
-
         // Trigger lose with shorter delay
         setTimeout(() => {
             this.playerLose();
@@ -958,17 +942,6 @@ class PuzzleGame {
             }
         }
         return correctCount;
-    }
-
-    // Show status message
-    showStatusMessage(message, type = "info") {
-        const statusEl = document.getElementById("statusMessage");
-        if (!statusEl) return;
-        statusEl.textContent = message;
-        statusEl.className = `status-message show ${type}`;
-        setTimeout(() => {
-            statusEl.classList.remove("show");
-        }, 3000);
     }
 
     // Update score display
@@ -1022,11 +995,6 @@ class PuzzleGame {
             return data;
         } catch (error) {
             console.error("Error saving game data:", error);
-            // Tampilkan pesan kesalahan ke pengguna
-            this.showStatusMessage(
-                "Gagal menyimpan hasil permainan. Silakan coba lagi.",
-                "error"
-            );
             throw error;
         }
     }
@@ -1125,12 +1093,6 @@ class PuzzleGame {
                         this.gameState.losses++;
                         this.gameState.gameHistory.push("lose");
                     }
-
-                    // Tampilkan lose match modal
-                    this.showStatusMessage(
-                        "Pemain lain telah memenangkan match!",
-                        "error"
-                    );
                     setTimeout(() => {
                         this.showLoseMatch();
                     }, 1500);
@@ -1189,11 +1151,6 @@ class PuzzleGame {
                     } catch (error) {
                         console.error("Error saving game data for losing player:", error);
                     }
-
-                    // Show immediate feedback
-                    this.showStatusMessage(`${data.winner} won this round!`, "error");
-                    
-                    // FIXED: Trigger playerLose with a short delay to show the message
                     setTimeout(() => {
                         this.playerLose();
                     }, 1000);

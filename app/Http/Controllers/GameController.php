@@ -10,10 +10,8 @@ use Illuminate\Support\Facades\Session;
 
 class GameController extends Controller
 {
-    // Menyimpan hasil game ke database
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'room_id' => 'required|integer',
@@ -22,13 +20,11 @@ class GameController extends Controller
             'round' => 'required|integer',
         ]);
 
-        // Simpan data dengan user_id
         $gameResult = GameResult::create($validated);
         
         return response()->json(['message' => 'Game result saved', 'data' => $gameResult], 201);
     }
 
-    // Membandingkan hasil dua pemain dan menentukan pemenang
     public function determineWinner($room_id, $round)
     {
         $results = GameResult::with('user')
@@ -51,14 +47,14 @@ class GameController extends Controller
 
         $winner = $sortedResults->first();
 
-        $this->updateUserLevel($winner->user_id);
+        // $this->updateUserLevel($winner->user_id);
 
         return response()->json([
             'message' => 'Pemenang ronde ' . $round . ' ditentukan',
             'winner' => $winner->user->username,
             'totalWin' => $winner->user->wins,
             'id' => $winner->user->id,
-            'pemenang' => 1, // Tambahkan ini untuk konsistensi dengan frontend
+            'pemenang' => 1, 
             'details' => [
                 'correct_pieces' => $winner->correct_pieces,
                 'time_taken' => $winner->time_taken,

@@ -32,10 +32,11 @@
                 <ul>
                     @if (Session::has('user'))
                         <li><a href="{{ route('profile.index') }}">Profile</a></li>
+                        <li><a href="{{ route('galleries.index', ['id' => session('user')->id]) }}">Dinopedia</a></li>
                     @else
                         <li><a href="{{ route('login.profile') }}">Profile</a></li>
+                        <li><a href="{{ route('galleries.index', ['id' => 0]) }}">Dinopedia</a></li>
                     @endif
-                    <li><a href="{{ route('galleries.index', ['id' => session('user')->id ]) }}">Dinopedia</a></li>
                     <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
                     <li><a href="{{ route('about.index') }}">Tentang</a></li>
                 </ul>
@@ -92,39 +93,6 @@
             <p>© 2025 DinoMatch - Uncovering Prehistoric Mysteries!</p>
         </footer>
     </div>
-
-    {{-- Modal Handling --}}
-    {{-- @if (!Session::has('user'))
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <h2>Gabung Room</h2>
-            <input type="text" name="username" placeholder="Nama Anda" required value="{{ session('player.username') }}">
-            <button type="submit" form="form-join">Gabung</button>
-            <button class="btn-close" onclick="closeModal()">Tutup</button>
-        </div>
-    </div>
-    @endif --}}
-
-    {{-- JavaScript --}}
-    <script>
-        // Keep existing JS functionality
-        // document.getElementById('form-join')?.addEventListener('submit', function() {
-        //     this.querySelector('button[type="submit"]').disabled = true;
-        // });
-
-        // function openModal() {
-        //     document.getElementById('myModal').style.display = 'block';
-        // }
-
-        // function closeModal() {
-        //     document.getElementById('myModal').style.display = 'none';
-        // }
-
-        // window.onclick = function(event) {
-        //     const modal = document.getElementById('myModal');
-        //     if (event.target === modal) closeModal();
-        // }
-    </script>
 </body>
 
 </html>

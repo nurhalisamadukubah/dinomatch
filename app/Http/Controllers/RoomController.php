@@ -266,8 +266,24 @@ class RoomController extends Controller
             ]);
         }
 
-        // Ambil room IDs yang unik
+        // Ambil semua room_id unik yang pernah diikuti user
         $roomIds = $user_results->pluck('room_id')->unique();
+
+        // Ambil room_id beserta timestamp terakhir aktivitas di room tersebut (dari semua user)
+        $roomTimestamps = [];
+
+        foreach ($roomIds as $roomId) {
+            $latestResult = GameResult::where('room_id', $roomId)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            $roomTimestamps[$roomId] = $latestResult ? $latestResult->created_at : now();
+        }
+
+        // Urutkan room berdasarkan timestamp terbaru (descending)
+        $sortedRoomIds = collect($roomTimestamps)
+            ->sortDesc()
+            ->keys();
 
         // Inisialisasi counter keseluruhan untuk menang dan kalah (berdasarkan room)
         $totalWins  = 0;
@@ -276,7 +292,7 @@ class RoomController extends Controller
         // Array untuk menyimpan detail tiap room, termasuk pemenang per ronde
         $roomStats = [];
 
-        foreach ($roomIds as $roomId) {
+        foreach ($sortedRoomIds as $roomId) {
             // Ambil semua GameResult di room ini, beserta relasi user, 
             // dan urutkan berdasarkan ronde lalu waktu (untuk keperluan sorting)
             $resultsInRoom = GameResult::with('user')

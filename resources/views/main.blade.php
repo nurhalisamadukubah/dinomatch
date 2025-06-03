@@ -53,9 +53,6 @@
         </div>
     </div>
 
-    <!-- Status Message -->
-    <div class="status-message" id="statusMessage"></div>
-
     <!-- Modals -->
     <div id="loseMatchModal" class="modal">
         <div class="modal-content lose-match-modal">

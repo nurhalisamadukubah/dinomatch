@@ -12,8 +12,12 @@ class GalleryController extends Controller
     public function index($id)
     {
         $player = User::find($id);
-        $level = $player->level;
-        $galleries = Gallery::take($level)->get();
+        if ($player == null) {
+            $galleries = Gallery::take(0)->get();
+        } else {
+            $level = $player->level;
+            $galleries = Gallery::take($level)->get();
+        }
         return view('galleries.index', compact('galleries'));
     }
 
