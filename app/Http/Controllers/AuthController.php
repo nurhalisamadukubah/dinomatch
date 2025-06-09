@@ -35,13 +35,31 @@ class AuthController extends Controller
     // Menampilkan halaman login
     public function showLogin()
     {
-        return view('auth.login');
+        $user = Session::has('user');
+        if ($user) {
+            return redirect('/room');
+        } else {
+            return response()->view('auth.login')->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]);
+        }
     }
 
     public function showJoin(Request $request)
     {
         $code = $request->code;
-        return view('auth.login', compact(['code']));
+        $user = Session::has('user');
+        if ($user) {
+            return redirect('/room');
+        } else {
+            return response()->view('auth.login', compact(['code']))->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]);
+        }
     }
 
     // Proses login

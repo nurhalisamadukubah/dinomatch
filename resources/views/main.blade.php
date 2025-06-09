@@ -25,7 +25,7 @@
                 BABAK: <span class="round" id="round">1</span>
             </div>
             <div class="game-info-item timer-info">
-                WAKTU: <span class="timer" id="time">0:25</span>
+                WAKTU: <span class="timer" id="time">00:00</span>
             </div>
             <div class="game-info-item score-info">
                 SCORE: <span class="score" id="score">0</span>

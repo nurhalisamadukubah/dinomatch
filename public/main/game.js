@@ -5,7 +5,7 @@ class PuzzleGame {
         this.config = {
             rows: config.rows || 4,
             columns: config.columns || 4,
-            timeLimit: config.timeLimit || 60, // seconds
+            timeLimit: config.timeLimit || 180, // seconds
             maxRounds: config.maxRounds || 3,
             // playerId: config.playerId || null,
             // roomId: config.roomId || null,
@@ -1238,9 +1238,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Configure game instance
     const game = new PuzzleGame({
-        rows: 2,
-        columns: 2,
-        timeLimit: 60,
+        rows: 4,
+        columns: 4,
+        timeLimit: 180,
         maxRounds: 3,
         playerId: playerId,
         roomId: roomId,

@@ -33,12 +33,16 @@
                     @if (Session::has('user'))
                         <li><a href="{{ route('profile.index') }}">Profile</a></li>
                         <li><a href="{{ route('galleries.index', ['id' => session('user')->id]) }}">Dinopedia</a></li>
+                        <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
+                        <li><a href="{{ route('about.index') }}">Tentang</a></li>
+                        <li><a href="{{ route('logout') }}">Logout</a></li>
                     @else
                         <li><a href="{{ route('login.profile') }}">Profile</a></li>
                         <li><a href="{{ route('galleries.index', ['id' => 0]) }}">Dinopedia</a></li>
+                        <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
+                        <li><a href="{{ route('about.index') }}">Tentang</a></li>
+                        <li><a href="{{ route('login') }}">Login</a></li>
                     @endif
-                    <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
-                    <li><a href="{{ route('about.index') }}">Tentang</a></li>
                 </ul>
             </nav>
         </header>
