@@ -62,6 +62,20 @@ class AuthController extends Controller
         }
     }
 
+    public function usualLoginShow()
+    {
+        $user = Session::has('user');
+        if ($user) {
+            return redirect('/room');
+        } else {
+            return response()->view('auth.login')->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]);
+        }
+    }
+
     // Proses login
     public function login(Request $request)
     {
@@ -77,6 +91,25 @@ class AuthController extends Controller
             Session::put('user', $user);
 
             return redirect('/gallery');
+        }
+
+        return back()->withErrors(['username' => 'Username atau password salah!']);
+    }
+
+    public function usualLogin(Request $request)
+    {
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('username', $request->username)->first();
+
+        if ($user && Hash::check($request->password, $user->password)) {
+            // Set session
+            Session::put('user', $user);
+
+            return redirect('/room');
         }
 
         return back()->withErrors(['username' => 'Username atau password salah!']);

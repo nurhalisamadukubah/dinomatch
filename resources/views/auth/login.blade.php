@@ -608,6 +608,8 @@
                 @elseif (request()->is('login/join'))
                     <form class="login-form" id="loginForm" method="POST" action="{{ route('join.post') }}">
                         <input type="hidden" value="{{ $code }}" name="code">
+                @elseif (request()->is('login/usual'))
+                    <form class="login-form" id="loginForm" method="POST" action="{{ route('login.usual') }}">
                 @endif
                     @csrf
 

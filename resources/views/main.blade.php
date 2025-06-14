@@ -56,16 +56,16 @@
     <!-- Modals -->
     <div id="loseMatchModal" class="modal">
         <div class="modal-content lose-match-modal">
-            <a href="{{ route('room.index') }}" style="text-decoration: none;"><span class="close" onclick="gameLogic.closeModal()">&times;</span></a>
+            <button onclick="redirectToHome()"><span class="close" onclick="gameLogic.closeModal()">&times;</span></button>
             <h2 class="modal-title">GAME OVER</h2>
             <div class="game-over-icon">😵‍💫</div>
             <p class="lose-text">Jangan Menyerah, Explorator!</p>
             <p class="retry-text">
                 Kembali ke   
-                <a href="{{ route('room.index') }}" style="text-decoration: none;"><button class="main-menu-btn" onclick="gameLogic.resetGame()">
+                <button class="main-menu-btn" onclick="gameLogic.resetGame(); redirectToHome()">
                     <span class="btn-icon">🔄</span>
                     Main Menu
-                </button></a> untuk Mencoba Tantangan Lainnya
+                </button> untuk Mencoba Tantangan Lainnya
             </p>
         </div>
     </div>
@@ -73,7 +73,7 @@
     <!-- Win Match Modal -->
     <div id="winMatchModal" class="modal">
         <div class="modal-content winner-modal">
-            <a href="{{ route('galleries.index', ['id' => $player_id]) }}" style="text-decoration: none;"><span class="close" onclick="gameLogic.closeModal()">&times;</span></a>
+            <button onclick="redirectToGallery()"><span class="close" onclick="gameLogic.closeModal()">&times;</span></button>
             <h2 class="modal-title">MENANG!</h2>
             <div class="trophy-display">
                 <div class="trophy-icon">🏆</div>
@@ -81,10 +81,10 @@
             </div>
             <p class="winner-text">
                 Kamu Memenangkan Tantangan!<br>
-                <a href="{{ route('galleries.index', ['id' => $player_id]) }}" style="text-decoration: none;"><button class="reward-btn">
+                <button class="reward-btn" onclick="redirectToGallery()">
                     <span class="btn-icon">⭐</span>
                     Ambil Hadiah
-                </button></a>
+                </button>
             </p>
         </div>
     </div>
@@ -149,6 +149,37 @@
     </div>
 
     <footer>
+        <script>
+            function redirectToGallery() {
+                const galleryUrl = "{{ route('galleries.index', ['id' => $player_id]) }}";
+                location.replace(galleryUrl); 
+            }
+
+            function redirectToHome() {
+                const HomeUrl = "{{ route('room.index') }}";
+                location.replace(HomeUrl); 
+            }
+        </script>
+        <script>
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function () {
+                window.history.pushState(null, null, window.location.href);
+                alert("Tombol back dinonaktifkan selama permainan.");
+            };
+        </script>
+        <script>
+            document.addEventListener("keydown", function (e) {
+                if ((e.key === "F5") || (e.ctrlKey && e.key === "r")) {
+                e.preventDefault();
+                alert("Refresh dinonaktifkan selama permainan.");
+                }
+            });
+        </script>
+        <script>
+            window.onbeforeunload = function () {
+                return "Permainan akan ter-reset. Apakah Anda yakin ingin meninggalkan halaman?";
+            };
+        </script>
         <script>
             const playerId = "{{ $player_id }}";
             const roomId = "{{ $room_id }}";

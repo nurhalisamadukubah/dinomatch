@@ -7,8 +7,6 @@ class PuzzleGame {
             columns: config.columns || 2,
             timeLimit: config.timeLimit || 60, // seconds
             maxRounds: config.maxRounds || 3,
-            // playerId: config.playerId || null,
-            // roomId: config.roomId || null,
             apiBaseUrl: config.apiBaseUrl || "http://127.0.0.1:8000",
             csrfToken:
                 config.csrfToken ||
@@ -18,9 +16,7 @@ class PuzzleGame {
             ...config,
         };
 
-        // Combined game state
         this.gameState = {
-            // Existing game state
             selectedPiece: null,
             placedPieces: 0,
             timeLeft: this.config.timeLimit,
@@ -31,7 +27,6 @@ class PuzzleGame {
             timer: null,
             winnerCheckInterval: null,
 
-            // New modal logic state
             currentRound: 1,
             wins: 0,
             losses: 0,
@@ -41,7 +36,6 @@ class PuzzleGame {
             matchWinnerCheckInterval: null,
         };
 
-        // Puzzle configuration
         this.puzzlePieces = [
             {
                 id: "A1",
@@ -71,35 +65,26 @@ class PuzzleGame {
         this.correctOrder = ["A1", "A2", "B1", "B2"];
     }
 
-    // Initialize the game
     init() {
         this.createBoard();
         this.createPieces();
         this.initializeScoreDisplay();
-
-        // Initialize new game logic
         this.initGameLogic();
-
-        // Auto-start with countdown
         this.startGameWithCountdown();
     }
 
-    // Initialize new game logic
     initGameLogic() {
         this.updateDisplay();
         this.bindEventListeners();
     }
 
-    // Bind event listeners for modals
     bindEventListeners() {
-        // Close modal on outside click
         window.addEventListener("click", (event) => {
             if (event.target.classList.contains("modal")) {
                 this.closeModal();
             }
         });
 
-        // Handle ESC key
         window.addEventListener("keydown", (event) => {
             if (event.key === "Escape" && this.gameState.activeModal) {
                 this.closeModal();
@@ -107,7 +92,6 @@ class PuzzleGame {
         });
     }
 
-    // Player wins current round
     playerWin() {
         if (this.gameState.currentRound > this.gameState.maxRounds) {
             alert(
@@ -121,10 +105,8 @@ class PuzzleGame {
         this.gameState.gameHistory.push("win");
         this.handleRoundResult("win");
         this.handleWinnerLogic();
-        
     }
 
-    // Player loses current round
     playerLose() {
         if (this.gameState.currentRound > this.gameState.maxRounds) {
             alert(
@@ -144,11 +126,9 @@ class PuzzleGame {
 
         console.log(`Round ${round} result: ${result}`, history);
 
-        // FIXED: Ensure game is completely stopped
         this.gameState.gameActive = false;
         this.clearAllIntervals();
 
-        // Round 1 logic
         if (round === 1) {
             if (result === "win") {
                 this.showModal("winRound1Modal", "countdown1");
@@ -156,12 +136,10 @@ class PuzzleGame {
                 this.showModal("loseRound1Modal", "countdown2");
             }
         }
-        // Round 2 logic
         else if (round === 2) {
             if (history[0] === "win" && result === "lose") {
                 this.showModal("loseRound2Modal", "countdown4");
             } else if (history[0] === "win" && result === "win") {
-                // Player wins 2 rounds in a row = wins match
                 if (roomId && !this.gameState.matchWinnerCheckInterval) {
                     this.gameState.matchWinnerCheckInterval = this.checkMatchWinner();
                 }
@@ -292,16 +270,12 @@ class PuzzleGame {
         }, 1000);
     }
 
-    // Claim reward (for winner modal)
     claimReward() {
         alert("🎉 Congratulations! You have claimed your reward! 🎉");
         this.closeModal();
-        // You can add more reward logic here
     }
 
-    // Reset game to initial state
     resetGame() {
-        // Clear all intervals
         if (this.gameState.timer) {
             clearInterval(this.gameState.timer);
             this.gameState.timer = null;
@@ -319,13 +293,11 @@ class PuzzleGame {
             this.gameState.countdownInterval = null;
         }
 
-        // Reset new game logic state
         this.gameState.currentRound = 1;
         this.gameState.wins = 0;
         this.gameState.losses = 0;
         this.gameState.gameHistory = [];
 
-        // Clear selections and highlights
         document.querySelectorAll(".puzzle-piece").forEach((piece) => {
             piece.classList.remove("hidden", "selected", "shake");
             piece.style.opacity = "1";
@@ -335,20 +307,17 @@ class PuzzleGame {
             slot.style.filter = "grayscale(100%) opacity(0.5)";
         });
 
-        // Reset existing game state
         this.gameState.selectedPiece = null;
         this.gameState.placedPieces = 0;
         this.gameState.gameActive = true;
         this.gameState.timeLeft = this.config.timeLimit;
         this.gameState.score = 0;
 
-        // Recreate pieces in random order
         this.createPieces();
         this.updateScore();
         this.updateDisplay();
     }
 
-    // Update display elements
     updateDisplay() {
         const currentRoundElement = document.getElementById("round");
         const winCountElement = document.getElementById("score");
@@ -376,23 +345,17 @@ class PuzzleGame {
             `Proceeding to next round. Current: ${this.gameState.currentRound}, Max: ${this.config.maxRounds}`
         );
 
-        // Clear all intervals before proceeding
         this.clearAllIntervals();
 
-        // Check if there are more rounds
         if (this.gameState.currentRound <= this.config.maxRounds) {
-            // Reset puzzle for next round
             this.resetPuzzleForNextRound();
-            // Start game with countdown
             this.startGameWithCountdown();
         }
     }
 
     resetPuzzleForNextRound() {
-        // Clear all intervals
         this.clearAllIntervals();
 
-        // Clear visual elements
         document.querySelectorAll(".puzzle-piece").forEach((piece) => {
             piece.classList.remove("hidden", "selected", "shake");
             piece.style.opacity = "1";
@@ -402,17 +365,14 @@ class PuzzleGame {
             slot.style.filter = "grayscale(100%) opacity(0.5)";
         });
 
-        // Reset puzzle state (don't reset round/wins/losses)
         this.gameState.selectedPiece = null;
         this.gameState.placedPieces = 0;
         this.gameState.gameActive = false; // Will be set true when countdown finishes
         this.gameState.timeLeft = this.config.timeLimit;
 
-        // Recreate pieces in random order
         this.createPieces();
     }
 
-    // Create game board
     createBoard() {
         const board = document.getElementById("board");
         if (!board) {
@@ -428,14 +388,12 @@ class PuzzleGame {
             slot.dataset.expectedId = pieceId;
             slot.classList.add("board-slot", "board");
             slot.style.filter = "grayscale(100%) opacity(0.5)";
-            // Add event listeners for both click and drag & drop
             slot.addEventListener("click", (e) => this.handleSlotClick(e));
             this.addDragListeners(slot);
             board.appendChild(slot);
         });
     }
 
-    // Create puzzle pieces
     createPieces() {
         const pieces = document.getElementById("pieces");
         if (!pieces) {
@@ -641,10 +599,8 @@ class PuzzleGame {
         piece.classList.remove("selected");
         piece.style.opacity = "0";
         this.gameState.placedPieces++;
-        // this.gameState.score += 10;
         this.updateScore();
         this.gameState.selectedPiece = null;
-        // Check if puzzle is complete
         if (this.gameState.placedPieces === this.puzzlePieces.length) {
             this.completePuzzle();
         }
@@ -662,29 +618,20 @@ class PuzzleGame {
 
     // Complete puzzle
     async completePuzzle() {
-        // FIXED: Immediately set game as inactive to prevent any further actions
         this.gameState.gameActive = false;
-        
-        // Clear all intervals immediately to stop other checks
-        this.clearAllIntervals();
 
-        // Calculate bonus points
+        this.clearAllIntervals();
         const timeBonus = Math.floor(this.gameState.timeLeft / 10) * 5;
-        // this.gameState.score += timeBonus;
         this.updateScore();
 
         const correctPieces = this.countCorrectPieces();
         const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
-
-        // Save game data first
         try {
             await this.saveGameData(correctPieces, timeTaken);
             console.log("Game data saved for winning player");
         } catch (error) {
             console.error("Error saving game data:", error);
         }
-
-        // Trigger win with shorter delay
         setTimeout(() => {
             this.playerWin();
         }, 1000);
@@ -707,13 +654,6 @@ class PuzzleGame {
             const updateData = await updateResponse.json();
             console.log("Level update response:", updateData);
 
-            // Update score display
-            // if (updateData.success) {
-            //     const scoreDisplay = document.getElementById("score");
-            //     if (scoreDisplay) {
-            //         scoreDisplay.innerText = updateData.wins;
-            //     }
-            // }
         } catch (error) {
             console.error("Error handling winner logic:", error);
         }
@@ -988,7 +928,6 @@ class PuzzleGame {
                 const data = await response.json();
                 console.log("Match winner check:", data); // Debug log
 
-                // Jika match sudah selesai dan ada pemenang yang bukan player ini
                 if (
                     data.match_finished &&
                     data.winner_id &&
@@ -1001,19 +940,16 @@ class PuzzleGame {
                         playerId
                     );
 
-                    // Stop semua game activity
                     this.gameState.gameActive = false;
                     clearInterval(this.gameState.timer);
                     clearInterval(this.gameState.winnerCheckInterval);
                     clearInterval(this.gameState.matchWinnerCheckInterval);
                     this.gameState.matchWinnerCheckInterval = null;
 
-                    // Save current progress sebagai kalah
                     const correctPieces = this.countCorrectPieces();
                     const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
                     await this.saveGameData(correctPieces, timeTaken);
 
-                    // Update game history jika belum ada
                     if (
                         this.gameState.gameHistory.length <
                         this.gameState.currentRound
@@ -1027,12 +963,10 @@ class PuzzleGame {
                 }
             } catch (error) {
                 console.error("Error checking match winner:", error);
-                // Jangan hentikan interval, coba lagi nanti
             }
         }, 2000); // Check setiap 2 detik
     }
 
-    // Check if other player won
     checkOtherPlayerWon() {
         return setInterval(async () => {
             // Skip if game is not active or round is finished
@@ -1062,14 +996,11 @@ class PuzzleGame {
                 // FIXED: More specific checking - ensure we only react once per round
                 if (data.pemenang == 1 && data.id != playerId && this.gameState.gameActive) {
                     console.log(`Player ${data.winner} won round ${this.gameState.currentRound}, current player ${playerId} loses`);
-                    
-                    // FIXED: Immediately stop the game to prevent continued play
+
                     this.gameState.gameActive = false;
-                    
-                    // Clear all intervals immediately
+
                     this.clearAllIntervals();
 
-                    // Save current progress as loss
                     const correctPieces = this.countCorrectPieces();
                     const timeTaken = this.config.timeLimit - this.gameState.timeLeft;
                     
@@ -1085,14 +1016,11 @@ class PuzzleGame {
                 }
             } catch (error) {
                 console.error("Error checking if another player won:", error);
-                // Don't stop the interval on error, just continue checking
             }
         }, 1500); // Check every 1.5 seconds for more responsive detection
     }
 
-    // Next round
     nextRound() {
-        // this.gameState.round++;
         const roundDisplay = document.getElementById("round");
         if (roundDisplay) {
             roundDisplay.innerText = this.gameState.currentRound;
@@ -1101,9 +1029,7 @@ class PuzzleGame {
         this.startGameWithCountdown();
     }
 
-    // Show finish modal
     async showFinishModal() {
-        // Reset wins after game completion
         try {
             const resetResponse = await fetch(
                 `${this.config.apiBaseUrl}/resetWins/${playerId}`,
@@ -1158,13 +1084,10 @@ class PuzzleGame {
     }
 }
 
-// Initialize game when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-    // Check if we're in a game room
     const roomId = document.getElementById("room-id")?.value;
     const playerId = document.getElementById("player-id")?.value;
 
-    // Configure game instance
     const game = new PuzzleGame({
         rows: 2,
         columns: 2,
@@ -1175,10 +1098,8 @@ document.addEventListener("DOMContentLoaded", () => {
         useServerImages: true,
     });
 
-    // Start game initialization
     game.init();
 
-    // Expose game to window for debugging/testing
     window.game = game;
     window.gameLogic = {
         playerWin: () => game.playerWin(),

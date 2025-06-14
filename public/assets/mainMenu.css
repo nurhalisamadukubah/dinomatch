@@ -172,7 +172,7 @@ main {
     justify-content: center;
     align-items: center;
     padding: 40px 20px;
-    background: url('/assets/images/additional/paper.jpg') no-repeat center;
+    background: url("/assets/images/additional/paper.jpg") no-repeat center;
     border-radius: 25px;
     margin: 20px 0 40px;
     border: 5px solid #734f30;
@@ -676,4 +676,38 @@ footer p:after {
     .fossil-bottom-right {
         opacity: 0.3;
     }
+}
+
+.swal2-confirm.btn-outline-danger {
+    background-color: transparent !important;
+    color: #dc3545 !important;
+    border: 1px solid #dc3545 !important;
+    border-radius: 5px !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.swal2-confirm.btn-outline-danger:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.swal2-cancel.btn-secondary {
+    background-color: transparent !important;
+    color: #6c757d !important;
+    border: 1px solid #6c757d !important;
+    border-radius: 5px !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.swal2-cancel.btn-secondary:hover {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+.swal2-actions {
+    gap: 10px !important;
 }

@@ -35,13 +35,13 @@
                         <li><a href="{{ route('galleries.index', ['id' => session('user')->id]) }}">Dinopedia</a></li>
                         <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
                         <li><a href="{{ route('about.index') }}">Tentang</a></li>
-                        <li><a href="{{ route('logout') }}">Logout</a></li>
+                        <li><a href="{{ route('logout') }}" id="logout-link" onclick="event.preventDefault(); confirmLogout();">Logout</a></li>
                     @else
                         <li><a href="{{ route('login.profile') }}">Profile</a></li>
                         <li><a href="{{ route('galleries.index', ['id' => 0]) }}">Dinopedia</a></li>
                         <li><a href="{{ route('tutorial.index') }}">Cara Bermain</a></li>
                         <li><a href="{{ route('about.index') }}">Tentang</a></li>
-                        <li><a href="{{ route('login') }}">Login</a></li>
+                        <li><a href="{{ route('usual') }}">Login</a></li>
                     @endif
                 </ul>
             </nav>
@@ -97,6 +97,115 @@
             <p>© 2025 DinoMatch - Uncovering Prehistoric Mysteries!</p>
         </footer>
     </div>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // function confirmLogout() {
+        //     Swal.fire({
+        //         title: 'Yakin ingin logout?',
+        //         text: "Kamu akan keluar dari sesi saat ini.",
+        //         icon: 'warning',
+        //         showCancelButton: true,
+        //         buttonsStyling: false,
+        //         customClass: {
+        //             confirmButton: 'btn btn-outline-danger',
+        //             cancelButton: 'btn btn-secondary'
+        //         },
+        //         confirmButtonText: 'Ya, Logout!',
+        //         cancelButtonText: 'Batal'
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             document.getElementById('logout-form').submit();
+        //             Swal.fire({
+        //                 title: 'Logged Out!',
+        //                 text: 'You have been successfully logged out.',
+        //                 icon: 'success',
+        //                 timer: 2000,
+        //                 showConfirmButton: false
+        //             });
+        //         }
+        //     });
+        // }
+
+    function confirmLogout() {
+    Swal.fire({
+        title: 'Yakin ingin logout?',
+        text: "Kamu akan keluar dari sesi saat ini.",
+        icon: 'warning',
+        showCancelButton: true,
+        buttonsStyling: false,
+        customClass: {
+            confirmButton: 'btn btn-outline-danger',
+            cancelButton: 'btn btn-secondary',
+            popup: 'custom-swal-popup'
+        },
+        confirmButtonText: 'Ya, Logout!',
+        cancelButtonText: 'Batal',
+        focusCancel: true, // Focus on cancel button by default for safety
+        allowOutsideClick: false, // Prevent accidental clicks outside
+        allowEscapeKey: true, // Allow ESC key to cancel
+        reverseButtons: true // Put cancel button on the right (common UX pattern)
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Logging out...',
+                text: 'Mohon tunggu sebentar.',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Simulate form submission with error handling
+            try {
+                const form = document.getElementById('logout-form');
+                if (form) {
+                    form.submit();
+                    
+                    // Set a timeout to show success message
+                    // (In real app, this would be handled by server response)
+                    setTimeout(() => {
+                        Swal.fire({
+                            title: 'Berhasil Logout!',
+                            text: 'Kamu telah berhasil keluar dari sesi.',
+                            icon: 'success',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                            customClass: {
+                                popup: 'custom-swal-popup'
+                            }
+                        });
+                    }, 500);
+                } else {
+                    throw new Error('Form logout tidak ditemukan');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
+                    icon: 'error',
+                    customClass: {
+                        confirmButton: 'btn btn-outline-danger',
+                        popup: 'custom-swal-popup'
+                    },
+                    buttonsStyling: false
+                });
+            }
+        }
+    });
+}
+
+    </script>
 </body>
 
 </html>

@@ -16,8 +16,10 @@ Route::get('/login/profile', [AuthController::class, 'showLogin'])->name('login.
 Route::post('/login/profile', [RoomController::class, 'profile'])->name('profile.post');
 Route::post('/login/join', [AuthController::class, 'showJoin'])->name('login.join');
 Route::post('/login/join/post', [RoomController::class, 'roomLogin'])->name('join.post');
+Route::get('/login/usual', [AuthController::class, 'usualLoginShow'])->name('usual');
+Route::post('/login/usual', [AuthController::class, 'usualLogin'])->name('login.usual');
 
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/', function () {
     // if (!Session::has('user')) {
