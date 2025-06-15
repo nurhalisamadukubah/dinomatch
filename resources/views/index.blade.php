@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/mainMenu.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/sweetalert.css') }}">
     <title>Game Room</title>
 </head>
 
@@ -104,107 +105,250 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // function confirmLogout() {
-        //     Swal.fire({
-        //         title: 'Yakin ingin logout?',
-        //         text: "Kamu akan keluar dari sesi saat ini.",
-        //         icon: 'warning',
-        //         showCancelButton: true,
-        //         buttonsStyling: false,
-        //         customClass: {
-        //             confirmButton: 'btn btn-outline-danger',
-        //             cancelButton: 'btn btn-secondary'
-        //         },
-        //         confirmButtonText: 'Ya, Logout!',
-        //         cancelButtonText: 'Batal'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             document.getElementById('logout-form').submit();
-        //             Swal.fire({
-        //                 title: 'Logged Out!',
-        //                 text: 'You have been successfully logged out.',
-        //                 icon: 'success',
-        //                 timer: 2000,
-        //                 showConfirmButton: false
-        //             });
-        //         }
-        //     });
-        // }
 
-    function confirmLogout() {
-    Swal.fire({
-        title: 'Yakin ingin logout?',
-        text: "Kamu akan keluar dari sesi saat ini.",
-        icon: 'warning',
-        showCancelButton: true,
-        buttonsStyling: false,
-        customClass: {
-            confirmButton: 'btn btn-outline-danger',
-            cancelButton: 'btn btn-secondary',
-            popup: 'custom-swal-popup'
-        },
-        confirmButtonText: 'Ya, Logout!',
-        cancelButtonText: 'Batal',
-        focusCancel: true, // Focus on cancel button by default for safety
-        allowOutsideClick: false, // Prevent accidental clicks outside
-        allowEscapeKey: true, // Allow ESC key to cancel
-        reverseButtons: true // Put cancel button on the right (common UX pattern)
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Show loading state
+        function confirmLogout() {
             Swal.fire({
-                title: 'Logging out...',
-                text: 'Mohon tunggu sebentar.',
-                icon: 'info',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                showConfirmButton: false,
-                didOpen: () => {
-                    Swal.showLoading();
+                title: 'Akhiri Ekspedisi?',
+                html: 'Apakah kamu yakin?<br><strong>Kemajuan kamu akan tersimpan dalam Dinopedia!</strong>',
+                icon: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn btn-outline-danger',
+                    cancelButton: 'btn btn-secondary',
+                    popup: 'dinomatch-theme'
+                },
+                confirmButtonText: 'Ya, Berkemas!',
+                cancelButtonText: 'Lanjut Menggali',
+                focusCancel: true, // Focus on cancel button by default for safety
+                allowOutsideClick: false, // Prevent accidental clicks outside
+                allowEscapeKey: true, // Allow ESC key to cancel
+                reverseButtons: true, // Put cancel button on the right (common UX pattern)
+                footer: 'Penemuan dinosaurus kamu selalu aman bersama kami!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading state with DinoMatch theme
+                    Swal.fire({
+                        title: 'Mengamankan Situs...',
+                        html: 'Mohon tunggu sebentar, kami sedang menyimpan hasil permainanmu.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'dinomatch-theme'
+                        },
+                        footer: 'Menyimpan jejak petualangan ...',
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Simulate form submission with error handling
+                    try {
+                        const form = document.getElementById('logout-form');
+                        if (form) {
+                            form.submit();
+                            
+                            // Set a timeout to show success message
+                            // (In real app, this would be handled by server response)
+                            setTimeout(() => {
+                                Swal.fire({
+                                    title: 'Situs Penggalian Diamankan!',
+                                    html: 'Terima kasih telah menjelajah bersama DinoMatch!<br>Sampai jumpa di petualangan prasejarah berikutnya! 🦕',
+                                    icon: 'success',
+                                    timer: 5000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        popup: 'dinomatch-theme'
+                                    },
+                                    footer: 'Tetap gali pengetahuan!'
+                                });
+                            }, 1000);
+                        } else {
+                            throw new Error('Form logout tidak ditemukan');
+                        }
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        Swal.fire({
+                            title: 'Oops! Fosil Tertinggal!',
+                            html: 'Terjadi kesalahan saat mengamankan situs penggalian.<br>Silakan coba lagi, Paleontolog Muda!',
+                            icon: 'error',
+                            customClass: {
+                                confirmButton: 'btn btn-outline-danger',
+                                popup: 'dinomatch-theme'
+                            },
+                            confirmButtonText: 'Coba Lagi',
+                            buttonsStyling: false,
+                            footer: 'Setiap ahli paleontologi pernah mengalami kesalahan!'
+                        });
+                    }
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // Show cancelled message with DinoMatch theme
+                    Swal.fire({
+                        title: 'Teruskan Eksplorasi!',
+                        html: 'Penggalian kamu berlanjut! Selamat berburu fosil! 🔍',
+                        icon: 'info',
+                        confirmButtonText: 'Kembali Berpetualang!',
+                        customClass: {
+                            popup: 'dinomatch-theme'
+                        },
+                        footer: 'Penemuan terbaik masih menanti!',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
                 }
             });
-
-            // Simulate form submission with error handling
-            try {
-                const form = document.getElementById('logout-form');
-                if (form) {
-                    form.submit();
-                    
-                    // Set a timeout to show success message
-                    // (In real app, this would be handled by server response)
-                    setTimeout(() => {
-                        Swal.fire({
-                            title: 'Berhasil Logout!',
-                            text: 'Kamu telah berhasil keluar dari sesi.',
-                            icon: 'success',
-                            timer: 2000,
-                            timerProgressBar: true,
-                            showConfirmButton: false,
-                            customClass: {
-                                popup: 'custom-swal-popup'
-                            }
-                        });
-                    }, 500);
-                } else {
-                    throw new Error('Form logout tidak ditemukan');
-                }
-            } catch (error) {
-                console.error('Logout error:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
-                    icon: 'error',
-                    customClass: {
-                        confirmButton: 'btn btn-outline-danger',
-                        popup: 'custom-swal-popup'
-                    },
-                    buttonsStyling: false
-                });
-            }
         }
-    });
-}
 
+        // Alternative function for different contexts
+        function confirmLogoutEnglish() {
+            Swal.fire({
+                title: 'End Your Dig?',
+                html: 'Are you sure you want to leave your excavation site?<br><strong>Your progress will be saved in the fossil record!</strong>',
+                icon: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn btn-outline-danger',
+                    cancelButton: 'btn btn-secondary',
+                    popup: 'dinomatch-theme'
+                },
+                confirmButtonText: 'Yes, Pack Up!',
+                cancelButtonText: 'Keep Digging',
+                focusCancel: true,
+                allowOutsideClick: false,
+                allowEscapeKey: true,
+                reverseButtons: true,
+                footer: 'Your dinosaur discoveries are always safe with us!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Securing Site...',
+                        html: 'Please wait while we save your excavation progress.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'dinomatch-theme'
+                        },
+                        footer: 'Saving prehistoric adventure traces...',
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    try {
+                        const form = document.getElementById('logout-form');
+                        if (form) {
+                            form.submit();
+                            
+                            setTimeout(() => {
+                                Swal.fire({
+                                    title: 'Dig Site Secured!',
+                                    html: 'Thanks for exploring with DinoMatch!<br>See you on your next prehistoric adventure! 🦕',
+                                    icon: 'success',
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        popup: 'dinomatch-theme'
+                                    },
+                                    footer: 'Keep digging for knowledge!'
+                                });
+                            }, 1000);
+                        } else {
+                            throw new Error('Logout form not found');
+                        }
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        Swal.fire({
+                            title: 'Oops! Fossil Left Behind!',
+                            html: 'An error occurred while securing your dig site.<br>Please try again, Junior Paleontologist!',
+                            icon: 'error',
+                            customClass: {
+                                confirmButton: 'btn btn-outline-danger',
+                                popup: 'dinomatch-theme'
+                            },
+                            confirmButtonText: 'Try Again',
+                            buttonsStyling: false,
+                            footer: 'Every paleontologist faces challenges!'
+                        });
+                    }
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire({
+                        title: 'Keep Exploring!',
+                        html: 'Your dig continues! Happy fossil hunting! 🔍',
+                        icon: 'info',
+                        confirmButtonText: 'Back to Adventure!',
+                        customClass: {
+                            popup: 'dinomatch-theme'
+                        },
+                        footer: 'The best discoveries are yet to come!',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                }
+            });
+        }
+
+        // Utility function to show DinoMatch themed alerts
+        function showDinoMatchAlert(config) {
+            const defaultConfig = {
+                customClass: {
+                    popup: 'dinomatch-theme'
+                },
+                buttonsStyling: false
+            };
+            
+            return Swal.fire({
+                ...defaultConfig,
+                ...config
+            });
+        }
+
+        // Example usage for other alerts in your app
+        function showSuccessAlert(title, message) {
+            return showDinoMatchAlert({
+                title: title,
+                html: message,
+                icon: 'success',
+                confirmButtonText: 'Lanjutkan!',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+
+        function showErrorAlert(title, message) {
+            return showDinoMatchAlert({
+                title: title,
+                html: message,
+                icon: 'error',
+                confirmButtonText: 'Mengerti',
+                customClass: {
+                    confirmButton: 'btn btn-outline-danger',
+                    popup: 'dinomatch-theme'
+                }
+            });
+        }
+
+        function showInfoAlert(title, message) {
+            return showDinoMatchAlert({
+                title: title,
+                html: message,
+                icon: 'info',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'btn btn-outline-primary',
+                    popup: 'dinomatch-theme'
+                }
+            });
+        }
+
+        // Export functions for use in other scripts (if using modules)
+        // export { confirmLogout, confirmLogoutEnglish, showDinoMatchAlert, showSuccessAlert, showErrorAlert, showInfoAlert };
     </script>
 </body>
 

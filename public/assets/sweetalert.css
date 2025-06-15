@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Bubblegum+Sans&display=swap');
+
+/* Custom SweetAlert2 Popup Styling */
+.swal2-popup.dinomatch-theme {
+    background: linear-gradient(135deg, #e6d2b5 0%, #d4c4a8 100%);
+    border: 6px solid #734f30;
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    font-family: 'Cabin', sans-serif;
+    position: relative;
+    overflow: hidden;
+    min-width: 400px;
+}
+
+/* Top decorative border */
+.swal2-popup.dinomatch-theme::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #daa520, #3a4d39, #daa520);
+    z-index: 1;
+}
+
+/* Title styling */
+.swal2-popup.dinomatch-theme .swal2-title {
+    font-family: 'Bubblegum Sans', cursive;
+    font-size: 28px;
+    color: #3a4d39;
+    text-shadow: 2px 2px 0 #daa520, -1px -1px 0 #daa520, 1px -1px 0 #daa520, -1px 1px 0 #daa520;
+    margin: 25px 0 20px 0;
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+}
+
+/* Content text styling */
+.swal2-popup.dinomatch-theme .swal2-html-container {
+    color: #3a4d39;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 20px 0;
+    text-shadow: 1px 1px 2px rgba(218, 165, 32, 0.3);
+}
+
+/* Icon styling */
+.swal2-popup.dinomatch-theme .swal2-icon {
+    border: 4px solid #734f30;
+    background-color: #f5f5dc;
+    border-radius: 50%;
+    margin: 20px auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.swal2-popup.dinomatch-theme .swal2-icon.swal2-warning {
+    color: #3a4d39;
+    font-size: 48px;
+}
+
+.swal2-popup.dinomatch-theme .swal2-icon.swal2-success {
+    color: #3a4d39;
+}
+
+.swal2-popup.dinomatch-theme .swal2-icon.swal2-error {
+    color: #dc3545;
+}
+
+.swal2-popup.dinomatch-theme .swal2-icon.swal2-info {
+    color: #3a4d39;
+}
+
+/* Actions container */
+.swal2-popup.dinomatch-theme .swal2-actions {
+    margin: 25px 0 15px 0;
+    gap: 15px;
+}
+
+/* Confirm button (Danger style) */
+.swal2-popup.dinomatch-theme .swal2-confirm {
+    background-color: #dc3545 !important;
+    border: 4px solid #daa520 !important;
+    color: #f5f5dc !important;
+    font-family: 'Bubblegum Sans', cursive !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    padding: 12px 30px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 0 #a02834, 0 8px 15px rgba(0, 0, 0, 0.3) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+}
+
+.swal2-popup.dinomatch-theme .swal2-confirm:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 0 #a02834, 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+    background-color: #c82333 !important;
+}
+
+.swal2-popup.dinomatch-theme .swal2-confirm:active {
+    transform: translateY(2px) !important;
+    box-shadow: 0 3px 0 #a02834, 0 5px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.swal2-popup.dinomatch-theme .swal2-confirm:focus {
+    box-shadow: 0 6px 0 #a02834, 0 8px 15px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(220, 53, 69, 0.5) !important;
+}
+
+/* Cancel button (Secondary style) */
+.swal2-popup.dinomatch-theme .swal2-cancel {
+    background-color: #3a4d39 !important;
+    border: 4px solid #daa520 !important;
+    color: #f5f5dc !important;
+    font-family: 'Bubblegum Sans', cursive !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    padding: 12px 30px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 0 #2c3c2c, 0 8px 15px rgba(0, 0, 0, 0.3) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+}
+
+.swal2-popup.dinomatch-theme .swal2-cancel:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 0 #2c3c2c, 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+    background-color: #4a6349 !important;
+}
+
+.swal2-popup.dinomatch-theme .swal2-cancel:active {
+    transform: translateY(2px) !important;
+    box-shadow: 0 3px 0 #2c3c2c, 0 5px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.swal2-popup.dinomatch-theme .swal2-cancel:focus {
+    box-shadow: 0 6px 0 #2c3c2c, 0 8px 15px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(58, 77, 57, 0.5) !important;
+}
+
+/* Footer styling */
+.swal2-popup.dinomatch-theme .swal2-footer {
+    background: transparent;
+    border-top: 3px solid #734f30;
+    margin-top: 20px;
+    padding: 15px;
+    color: #3a4d39;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.swal2-popup.dinomatch-theme .swal2-footer::before,
+.swal2-popup.dinomatch-theme .swal2-footer::after {
+    content: "🦖";
+    margin: 0 8px;
+}
+
+/* Loading spinner styling */
+.swal2-popup.dinomatch-theme .swal2-loader {
+    border-color: #3a4d39 transparent #3a4d39 transparent;
+}
+
+/* Timer progress bar */
+.swal2-popup.dinomatch-theme .swal2-timer-progress-bar {
+    background: #daa520;
+    height: 6px;
+}
+
+/* Custom backdrop */
+.swal2-backdrop-show {
+    background: rgba(58, 77, 57, 0.8) !important;
+}
+
+/* Animation enhancements */
+.swal2-show.dinomatch-theme {
+    animation: dinoSlideIn 0.5s ease-out;
+}
+
+@keyframes dinoSlideIn {
+    0% {
+        transform: scale(0.7) rotate(-10deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05) rotate(2deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.swal2-hide.dinomatch-theme {
+    animation: dinoSlideOut 0.3s ease-in;
+}
+
+@keyframes dinoSlideOut {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.8) rotate(-5deg);
+        opacity: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .swal2-popup.dinomatch-theme {
+        min-width: 320px;
+        margin: 10px;
+    }
+    
+    .swal2-popup.dinomatch-theme .swal2-title {
+        font-size: 24px;
+    }
+    
+    .swal2-popup.dinomatch-theme .swal2-html-container {
+        font-size: 16px;
+    }
+    
+    .swal2-popup.dinomatch-theme .swal2-confirm,
+    .swal2-popup.dinomatch-theme .swal2-cancel {
+        font-size: 16px !important;
+        padding: 10px 25px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .swal2-popup.dinomatch-theme .swal2-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .swal2-popup.dinomatch-theme .swal2-confirm,
+    .swal2-popup.dinomatch-theme .swal2-cancel {
+        width: 100%;
+        margin: 5px 0 !important;
+    }
+}
